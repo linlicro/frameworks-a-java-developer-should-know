@@ -156,3 +156,5 @@ buildNumber.properties
 .flattened-pom.xml
 
 # End of https://www.gitignore.io/api/java,macos,maven,intellij
+/frameworks-a-java-developer-should-know.iml
+/.idea/
