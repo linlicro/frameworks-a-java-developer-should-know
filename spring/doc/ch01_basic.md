@@ -452,6 +452,7 @@ protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) {
 public int loadBeanDefinitions(String... locations) throws BeanDefinitionStoreException {
     Assert.notNull(locations, "Location array must not be null");
     int counter = 0;
+    // 处理多个 resource 文件
     for (String location : locations) {
         counter += loadBeanDefinitions(location);
     }
@@ -495,107 +496,114 @@ public int loadBeanDefinitions(String location, Set<Resource> actualResources) {
 }
 ```
 
-调用 `PathMatchingResourcePatternResolver.getResources(String locationPattern)`,
+接着往下看，
 
 ```java
-@Override
-public Resource[] getResources(String locationPattern) throws IOException {
-    Assert.notNull(locationPattern, "Location pattern must not be null");
-    //classpath:
-    if (locationPattern.startsWith(CLASSPATH_ALL_URL_PREFIX)) {
-        // a class path resource (multiple resources for same name possible)
-        //matcher是一个AntPathMatcher对象
-        if (getPathMatcher().isPattern(locationPattern
-            .substring(CLASSPATH_ALL_URL_PREFIX.length()))) {
-            // a class path resource pattern
-            return findPathMatchingResources(locationPattern);
-        } else {
-            // all class path resources with the given name
-            return findAllClassPathResources(locationPattern
-                .substring(CLASSPATH_ALL_URL_PREFIX.length()));
-        }
-    } else {
-        // Only look for a pattern after a prefix here
-        // (to not get fooled by a pattern symbol in a strange prefix).
-        int prefixEnd = locationPattern.indexOf(":") + 1;
-        if (getPathMatcher().isPattern(locationPattern.substring(prefixEnd))) {
-            // a file pattern
-            return findPathMatchingResources(locationPattern);
-        }
-        else {
-            // a single resource with the given name
-            return new Resource[] {getResourceLoader().getResource(locationPattern)};
-        }
+public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefinitionStoreException {
+  Assert.notNull(encodedResource, "EncodedResource must not be null");
+  if (logger.isTraceEnabled()) {
+   logger.trace("Loading XML bean definitions from " + encodedResource);
+  }
+
+  // 用一个 ThreadLocal 来存放配置文件资源
+  Set<EncodedResource> currentResources = this.resourcesCurrentlyBeingLoaded.get();
+  if (currentResources == null) {
+   currentResources = new HashSet<>(4);
+   this.resourcesCurrentlyBeingLoaded.set(currentResources);
+  }
+  if (!currentResources.add(encodedResource)) {
+   throw new BeanDefinitionStoreException(
+     "Detected cyclic loading of " + encodedResource + " - check your import definitions!");
+  }
+  try {
+   InputStream inputStream = encodedResource.getResource().getInputStream();
+   try {
+    InputSource inputSource = new InputSource(inputStream);
+    if (encodedResource.getEncoding() != null) {
+     inputSource.setEncoding(encodedResource.getEncoding());
     }
-}
+    // 核心部分是这里，往下面看
+    return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
+   }
+   finally {
+    inputStream.close();
+   }
+  }
+  catch (IOException ex) {
+   throw new BeanDefinitionStoreException(
+     "IOException parsing XML document from " + encodedResource.getResource(), ex);
+  }
+  finally {
+   currentResources.remove(encodedResource);
+   if (currentResources.isEmpty()) {
+    this.resourcesCurrentlyBeingLoaded.remove();
+   }
+  }
+ }
 ```
-
-这里可以看到 `classpath*:` 以及 可以看出配置文件路径是支持ant风格的。
-
-回到 `AbstractBeanDefinitionReader.loadBeanDefinitions(String location, Set<Resource> actualResources)`，来时加载配置文件元数据。
-
-配置文件加载 - `int loadCount = loadBeanDefinitions(resources);`
 
 ```java
-//加载
-Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
-//解析
-int loadCount = loadBeanDefinitions(resources);
+protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
+   throws BeanDefinitionStoreException {
+
+  try {
+   // 这里就不看了，将 xml 文件转换为 Document 对象
+   Document doc = doLoadDocument(inputSource, resource);
+   // 接着 往下看
+   int count = registerBeanDefinitions(doc, resource);
+   if (logger.isDebugEnabled()) {
+    logger.debug("Loaded " + count + " bean definitions from " + resource);
+   }
+   return count;
+  }
+  catch (BeanDefinitionStoreException ex) {
+   throw ex;
+  }
+  catch (SAXParseException ex) {
+   throw new XmlBeanDefinitionStoreException(resource.getDescription(),
+     "Line " + ex.getLineNumber() + " in XML document from " + resource + " is invalid", ex);
+  }
+  catch (SAXException ex) {
+   throw new XmlBeanDefinitionStoreException(resource.getDescription(),
+     "XML document from " + resource + " is invalid", ex);
+  }
+  catch (ParserConfigurationException ex) {
+   throw new BeanDefinitionStoreException(resource.getDescription(),
+     "Parser configuration exception parsing XML from " + resource, ex);
+  }
+  catch (IOException ex) {
+   throw new BeanDefinitionStoreException(resource.getDescription(),
+     "IOException parsing XML document from " + resource, ex);
+  }
+  catch (Throwable ex) {
+   throw new BeanDefinitionStoreException(resource.getDescription(),
+     "Unexpected exception parsing XML document from " + resource, ex);
+  }
+ }
 ```
 
-可以看到 就是在 逐个调用 `XmlBeanDefinitionReader.loadBeanDefinitions`:
+```java
+public int registerBeanDefinitions(Document doc, Resource resource) throws BeanDefinitionStoreException {
+  BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
+  int countBefore = getRegistry().getBeanDefinitionCount();
+  // 往下看
+  documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
+  return getRegistry().getBeanDefinitionCount() - countBefore;
+ }
+```
 
 ```java
 @Override
-public int loadBeanDefinitions(Resource resource) {
-    return loadBeanDefinitions(new EncodedResource(resource));
+public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) {
+   this.readerContext = readerContext;
+   logger.debug("Loading bean definitions");
+   Element root = doc.getDocumentElement();
+   // 从 xml 根节点开始解析文件
+   doRegisterBeanDefinitions(root);
 }
 ```
 
-这里的 `Resource`是一种资源的接口，而 `EncodedResource` 扮演的其实是一个装饰器的模式，为InputStreamSource添加了字符编码(虽然默认为null)。
-
-之前的关键调用是
-
-```java
-InputSource inputSource = new InputSource(inputStream);
-if (encodedResource.getEncoding() != null) {
-	inputSource.setEncoding(encodedResource.getEncoding());
-}
-return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
-```
-
-then, `doLoadBeanDefinitions`:
-
-```java
-protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource) {
-    Document doc = doLoadDocument(inputSource, resource);
-    return registerBeanDefinitions(doc, resource);
-}
-```
-
-then, `doLoadDocument`：
-
-```java
-protected Document doLoadDocument(InputSource inputSource, Resource resource) {
-    return this.documentLoader.loadDocument(inputSource, getEntityResolver(), this.errorHandler,
-        getValidationModeForResource(resource), isNamespaceAware());
-}
-```
-
-往里看，可以看到，Spring还是使用了dom的方式解析。
-
-下一步，解析 `int count = registerBeanDefinitions(doc, resource);`。
-
-`XmlBeanDefinitionReader.registerBeanDefinitions`:
-
-```java
-public int registerBeanDefinitions(Document doc, Resource resource) {
-    BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
-    int countBefore = getRegistry().getBeanDefinitionCount();
-    documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
-    return getRegistry().getBeanDefinitionCount() - countBefore;
-}
-```
+经过漫长的链路，一个配置文件终于转换为一颗 DOM 树了，注意，这里指的是其中一个配置文件，不是所有的，读者可以看到上面有个 for 循环的。下面开始从根节点开始解析。
 
 最终调用 `DefaultBeanDefinitionDocumentReader.doRegisterBeanDefinitions`:
 
@@ -674,7 +682,7 @@ delegate的作用在于处理beans标签的嵌套，其实Spring配置文件是�
 xml(schema)的命名空间其实类似于java的包名，命名空间采用URL，比如Spring的是这样:
 
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>    
+<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"></beans>
 ```
 
@@ -683,43 +691,26 @@ import, alias, bean, 嵌套的beans四种元素 解析：
 ```java
 private void parseDefaultElement(Element ele, BeanDefinitionParserDelegate delegate) {
   if (delegate.nodeNameEquals(ele, IMPORT_ELEMENT)) {
-            // 处理 <import /> 标签
-			importBeanDefinitionResource(ele);
-		}
-		else if (delegate.nodeNameEquals(ele, ALIAS_ELEMENT)) {
-            // 处理 <alias /> 标签定义
-            // <alias name="fromName" alias="toName"/>
-			processAliasRegistration(ele);
-		}
-		else if (delegate.nodeNameEquals(ele, BEAN_ELEMENT)) {
-            // 处理 <bean /> 标签定义，这也算是我们的重点吧
-			processBeanDefinition(ele, delegate);
-		}
-		else if (delegate.nodeNameEquals(ele, NESTED_BEANS_ELEMENT)) {
-			// 如果碰到的是嵌套的 <beans /> 标签，需要递归
-			doRegisterBeanDefinitions(ele);
-		}
-	}
+    // 处理 <import /> 标签
+   importBeanDefinitionResource(ele);
+  }
+  else if (delegate.nodeNameEquals(ele, ALIAS_ELEMENT)) {
+    // 处理 <alias /> 标签定义
+    // <alias name="fromName" alias="toName"/>
+   processAliasRegistration(ele);
+  }
+  else if (delegate.nodeNameEquals(ele, BEAN_ELEMENT)) {
+    // 处理 <bean /> 标签定义，这也算是我们的重点吧
+   processBeanDefinition(ele, delegate);
+  }
+  else if (delegate.nodeNameEquals(ele, NESTED_BEANS_ELEMENT)) {
+   // 如果碰到的是嵌套的 <beans /> 标签，需要递归
+   doRegisterBeanDefinitions(ele);
+  }
+ }
 ```
 
-**import**
-
-写法示例:
-
-```xml
-<import resource="CTIContext.xml" />
-<import resource="customerContext.xml" />
-```
-
-**alias**
-
-```xml
-<alias name="componentA-dataSource" alias="componentB-dataSource"/>
-```
-
-**bean**
-
-重点分析下。
+重点 `<bean />` 标签出来说一下。
 
 ```java
 protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
@@ -895,7 +886,7 @@ public AbstractBeanDefinition parseBeanDefinitionElement(
       parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
       // 解析 <replaced-method />
       parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
-    // 解析 <constructor-arg />
+      // 解析 <constructor-arg />
       parseConstructorArgElements(ele, bd);
       // 解析 <property />
       parsePropertyElements(ele, bd);
@@ -925,39 +916,6 @@ public AbstractBeanDefinition parseBeanDefinitionElement(
 ```
 
 到这里，我们已经完成了根据 `<bean />` 配置创建了一个 BeanDefinitionHolder 实例。
-
-beanName生成 源码:
-
-```java
-public static String generateBeanName(
-        BeanDefinition definition, BeanDefinitionRegistry registry, boolean isInnerBean) {
-    String generatedBeanName = definition.getBeanClassName();
-    if (generatedBeanName == null) {
-        if (definition.getParentName() != null) {
-            generatedBeanName = definition.getParentName() + "$child";
-             //工厂方法产生的bean
-        } else if (definition.getFactoryBeanName() != null) {
-            generatedBeanName = definition.getFactoryBeanName() + "$created";
-        }
-    }
-    String id = generatedBeanName;
-    if (isInnerBean) {
-        // Inner bean: generate identity hashcode suffix.
-        id = generatedBeanName + GENERATED_BEAN_NAME_SEPARATOR + 
-            ObjectUtils.getIdentityHexString(definition);
-    } else {
-        // Top-level bean: use plain class name.
-        // Increase counter until the id is unique.
-        int counter = -1;
-         //用类名#自增的数字命名
-        while (counter == -1 || registry.containsBeanDefinition(id)) {
-            counter++;
-            id = generatedBeanName + GENERATED_BEAN_NAME_SEPARATOR + counter;
-        }
-    }
-    return id;
-}
-```
 
 下一步，注册 `BeanDefiniton`, 主要就干了这么两件事:
 
@@ -1070,6 +1028,8 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 }
 ```
 
+总结一下，到这里已经初始化了 Bean 容器，`<bean />`配置也相应的转换为了一个个 BeanDefinition，然后注册了各个 BeanDefinition 到注册中心，并且发送了注册事件。
+
 【一个分水岭】说完 obtainFreshBeanFactory() 方法啦....
 
 下一步，对BeanFactory进行一些特征的设置 - `prepareBeanFactory`，有以下几个方面:
@@ -1125,7 +1085,9 @@ then, `MessageSource` 用以支持Spring国际化。
 
 参考: [详解Spring事件驱动模型](https://www.iteye.com/blog/jinnianshilongnian-1902886)
 
-...
+#### 初始化所有的 singleton beans
+
+TODO: 20191210 <https://javadoop.com/post/spring-ioc>
 
 #### getBean()如何获得实例
 
@@ -1133,34 +1095,34 @@ then, `MessageSource` 用以支持Spring国际化。
 
 ```java
 @Override
-	public Object getBean(String name) throws BeansException {
-		assertBeanFactoryActive();
-		return getBeanFactory().getBean(name);
-	}
+ public Object getBean(String name) throws BeansException {
+  assertBeanFactoryActive();
+  return getBeanFactory().getBean(name);
+ }
 
-	@Override
-	public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
-		assertBeanFactoryActive();
-		return getBeanFactory().getBean(name, requiredType);
-	}
+ @Override
+ public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
+  assertBeanFactoryActive();
+  return getBeanFactory().getBean(name, requiredType);
+ }
 
-	@Override
-	public Object getBean(String name, Object... args) throws BeansException {
-		assertBeanFactoryActive();
-		return getBeanFactory().getBean(name, args);
-	}
+ @Override
+ public Object getBean(String name, Object... args) throws BeansException {
+  assertBeanFactoryActive();
+  return getBeanFactory().getBean(name, args);
+ }
 
-	@Override
-	public <T> T getBean(Class<T> requiredType) throws BeansException {
-		assertBeanFactoryActive();
-		return getBeanFactory().getBean(requiredType);
-	}
+ @Override
+ public <T> T getBean(Class<T> requiredType) throws BeansException {
+  assertBeanFactoryActive();
+  return getBeanFactory().getBean(requiredType);
+ }
 
-	@Override
-	public <T> T getBean(Class<T> requiredType, Object... args) throws BeansException {
-		assertBeanFactoryActive();
-		return getBeanFactory().getBean(requiredType, args);
-	}
+ @Override
+ public <T> T getBean(Class<T> requiredType, Object... args) throws BeansException {
+  assertBeanFactoryActive();
+  return getBeanFactory().getBean(requiredType, args);
+ }
 ```
 
 后面的坑待填... // todo
