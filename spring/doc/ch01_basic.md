@@ -1087,7 +1087,121 @@ then, `MessageSource` 用以支持Spring国际化。
 
 #### 初始化所有的 singleton beans
 
-TODO: 20191210 <https://javadoop.com/post/spring-ioc>
+Spring 会在接下来初始化所有的 singleton beans:
+
+```java
+// 初始化剩余的 singleton beans
+protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
+
+   // 首先，初始化名字为 conversionService 的 Bean。
+   if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
+         beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
+      beanFactory.setConversionService(
+            beanFactory.getBean(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class));
+   }
+
+   // Register a default embedded value resolver if no bean post-processor
+   // (such as a PropertyPlaceholderConfigurer bean) registered any before:
+   // at this point, primarily for resolution in annotation attribute values.
+   if (!beanFactory.hasEmbeddedValueResolver()) {
+      beanFactory.addEmbeddedValueResolver(new StringValueResolver() {
+         @Override
+         public String resolveStringValue(String strVal) {
+            return getEnvironment().resolvePlaceholders(strVal);
+         }
+      });
+   }
+
+   // 先初始化 LoadTimeWeaverAware 类型的 Bean，这是 AspectJ 相关的内容
+   String[] weaverAwareNames = beanFactory.getBeanNamesForType(LoadTimeWeaverAware.class, false, false);
+   for (String weaverAwareName : weaverAwareNames) {
+      getBean(weaverAwareName);
+   }
+
+   // Stop using the temporary ClassLoader for type matching.
+   beanFactory.setTempClassLoader(null);
+
+   // 开始预初始化 singleton beans 了，
+   // 肯定不希望这个时候还出现 bean 定义解析、加载、注册。
+   beanFactory.freezeConfiguration();
+
+   // 开始初始化
+   beanFactory.preInstantiateSingletons();
+}
+```
+
+接下来，preInstantiateSingletons:
+
+```java
+@Override
+public void preInstantiateSingletons() throws BeansException {
+   if (this.logger.isDebugEnabled()) {
+      this.logger.debug("Pre-instantiating singletons in " + this);
+   }
+   // this.beanDefinitionNames 保存了所有的 beanNames
+   List<String> beanNames = new ArrayList<String>(this.beanDefinitionNames);
+
+   // 触发所有的非懒加载的 singleton beans 的初始化操作
+   for (String beanName : beanNames) {
+
+      // 合并父 Bean 中的配置，注意 <bean id="" class="" parent="" /> 中的 parent，用的不多吧，
+      // 考虑到这可能会影响大家的理解，我在附录中解释了一下 "Bean 继承"，不了解的请到附录中看一下
+      RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+
+      // 非抽象、非懒加载的 singletons。如果配置了 'abstract = true'，那是不需要初始化的
+      if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+         // 处理 FactoryBean(读者如果不熟悉 FactoryBean，请移步附录区了解)
+         if (isFactoryBean(beanName)) {
+            // FactoryBean 的话，在 beanName 前面加上 ‘&’ 符号。再调用 getBean，getBean 方法别急
+            final FactoryBean<?> factory = (FactoryBean<?>) getBean(FACTORY_BEAN_PREFIX + beanName);
+            // 判断当前 FactoryBean 是否是 SmartFactoryBean 的实现，此处忽略，直接跳过
+            boolean isEagerInit;
+            if (System.getSecurityManager() != null && factory instanceof SmartFactoryBean) {
+               isEagerInit = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                  @Override
+                  public Boolean run() {
+                     return ((SmartFactoryBean<?>) factory).isEagerInit();
+                  }
+               }, getAccessControlContext());
+            }
+            else {
+               isEagerInit = (factory instanceof SmartFactoryBean &&
+                     ((SmartFactoryBean<?>) factory).isEagerInit());
+            }
+            if (isEagerInit) {
+
+               getBean(beanName);
+            }
+         }
+         else {
+            // 对于普通的 Bean，只要调用 getBean(beanName) 这个方法就可以进行初始化了
+            getBean(beanName);
+         }
+      }
+   }
+
+   // 到这里说明所有的非懒加载的 singleton beans 已经完成了初始化
+   // 如果我们定义的 bean 是实现了 SmartInitializingSingleton 接口的，那么在这里得到回调，忽略
+   for (String beanName : beanNames) {
+      Object singletonInstance = getSingleton(beanName);
+      if (singletonInstance instanceof SmartInitializingSingleton) {
+         final SmartInitializingSingleton smartSingleton = (SmartInitializingSingleton) singletonInstance;
+         if (System.getSecurityManager() != null) {
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
+               @Override
+               public Object run() {
+                  smartSingleton.afterSingletonsInstantiated();
+                  return null;
+               }
+            }, getAccessControlContext());
+         }
+         else {
+            smartSingleton.afterSingletonsInstantiated();
+         }
+      }
+   }
+}
+```
 
 #### getBean()如何获得实例
 
@@ -1125,7 +1239,179 @@ TODO: 20191210 <https://javadoop.com/post/spring-ioc>
  }
 ```
 
-后面的坑待填... // todo
+接着到`doGetBean`。
+
+```java
+// 我们在剖析初始化 Bean 的过程，但是 getBean 方法我们经常是用来从容器中获取 Bean 用的，注意切换思路，
+// 已经初始化过了就从容器中直接返回，否则就先初始化再返回
+@SuppressWarnings("unchecked")
+protected <T> T doGetBean(
+      final String name, final Class<T> requiredType, final Object[] args, boolean typeCheckOnly)
+      throws BeansException {
+   // 获取一个 “正统的” beanName，处理两种情况，一个是前面说的 FactoryBean(前面带 ‘&’)，
+   // 一个是别名问题，因为这个方法是 getBean，获取 Bean 用的，你要是传一个别名进来，是完全可以的
+   final String beanName = transformedBeanName(name);
+
+   // 注意跟着这个，这个是返回值
+   Object bean;
+
+   // 检查下是不是已经创建过了
+   Object sharedInstance = getSingleton(beanName);
+
+   // 这里说下 args 呗，虽然看上去一点不重要。前面我们一路进来的时候都是 getBean(beanName)，
+   // 所以 args 传参其实是 null 的，但是如果 args 不为空的时候，那么意味着调用方不是希望获取 Bean，而是创建 Bean
+   if (sharedInstance != null && args == null) {
+      if (logger.isDebugEnabled()) {
+         if (isSingletonCurrentlyInCreation(beanName)) {
+            logger.debug("...");
+         }
+         else {
+            logger.debug("Returning cached instance of singleton bean '" + beanName + "'");
+         }
+      }
+      // 下面这个方法：如果是普通 Bean 的话，直接返回 sharedInstance，
+      // 如果是 FactoryBean 的话，返回它创建的那个实例对象
+      bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
+   }
+
+   else {
+      if (isPrototypeCurrentlyInCreation(beanName)) {
+         // 创建过了此 beanName 的 prototype 类型的 bean，那么抛异常
+         throw new BeanCurrentlyInCreationException(beanName);
+      }
+
+      // 检查一下这个 BeanDefinition 在容器中是否存在
+      BeanFactory parentBeanFactory = getParentBeanFactory();
+      if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
+         // 如果当前容器不存在这个 BeanDefinition，试试父容器中有没有
+         String nameToLookup = originalBeanName(name);
+         if (args != null) {
+            // 返回父容器的查询结果
+            return (T) parentBeanFactory.getBean(nameToLookup, args);
+         }
+         else {
+            // No args -> delegate to standard getBean method.
+            return parentBeanFactory.getBean(nameToLookup, requiredType);
+         }
+      }
+
+      if (!typeCheckOnly) {
+         // typeCheckOnly 为 false，将当前 beanName 放入一个 alreadyCreated 的 Set 集合中。
+         markBeanAsCreated(beanName);
+      }
+
+      /*
+       * 稍稍总结一下：
+       * 到这里的话，要准备创建 Bean 了，对于 singleton 的 Bean 来说，容器中还没创建过此 Bean；
+       * 对于 prototype 的 Bean 来说，本来就是要创建一个新的 Bean。
+       */
+      try {
+         final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
+         checkMergedBeanDefinition(mbd, beanName, args);
+
+         // 先初始化依赖的所有 Bean，这个很好理解。
+         // 注意，这里的依赖指的是 depends-on 中定义的依赖
+         String[] dependsOn = mbd.getDependsOn();
+         if (dependsOn != null) {
+            for (String dep : dependsOn) {
+               // 检查是不是有循环依赖，这里的循环依赖和我们前面说的循环依赖又不一样，这里肯定是不允许出现的，不然要乱套了，读者想一下就知道了
+               if (isDependent(beanName, dep)) {
+                  throw new BeanCreationException(mbd.getResourceDescription(), beanName,
+                        "Circular depends-on relationship between '" + beanName + "' and '" + dep + "'");
+               }
+               // 注册一下依赖关系
+               registerDependentBean(dep, beanName);
+               // 先初始化被依赖项
+               getBean(dep);
+            }
+         }
+
+         // 如果是 singleton scope 的，创建 singleton 的实例
+         if (mbd.isSingleton()) {
+            sharedInstance = getSingleton(beanName, new ObjectFactory<Object>() {
+               @Override
+               public Object getObject() throws BeansException {
+                  try {
+                     // 执行创建 Bean，详情后面再说
+                     return createBean(beanName, mbd, args);
+                  }
+                  catch (BeansException ex) {
+                     destroySingleton(beanName);
+                     throw ex;
+                  }
+               }
+            });
+            bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
+         }
+
+         // 如果是 prototype scope 的，创建 prototype 的实例
+         else if (mbd.isPrototype()) {
+            // It's a prototype -> create a new instance.
+            Object prototypeInstance = null;
+            try {
+               beforePrototypeCreation(beanName);
+               // 执行创建 Bean
+               prototypeInstance = createBean(beanName, mbd, args);
+            }
+            finally {
+               afterPrototypeCreation(beanName);
+            }
+            bean = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
+         }
+
+         // 如果不是 singleton 和 prototype 的话，需要委托给相应的实现类来处理
+         else {
+            String scopeName = mbd.getScope();
+            final Scope scope = this.scopes.get(scopeName);
+            if (scope == null) {
+               throw new IllegalStateException("No Scope registered for scope name '" + scopeName + "'");
+            }
+            try {
+               Object scopedInstance = scope.get(beanName, new ObjectFactory<Object>() {
+                  @Override
+                  public Object getObject() throws BeansException {
+                     beforePrototypeCreation(beanName);
+                     try {
+                        // 执行创建 Bean
+                        return createBean(beanName, mbd, args);
+                     }
+                     finally {
+                        afterPrototypeCreation(beanName);
+                     }
+                  }
+               });
+               bean = getObjectForBeanInstance(scopedInstance, name, beanName, mbd);
+            }
+            catch (IllegalStateException ex) {
+               throw new BeanCreationException(beanName,
+                     "Scope '" + scopeName + "' is not active for the current thread; consider " +
+                     "defining a scoped proxy for this bean if you intend to refer to it from a singleton",
+                     ex);
+            }
+         }
+      }
+      catch (BeansException ex) {
+         cleanupAfterBeanCreationFailure(beanName);
+         throw ex;
+      }
+   }
+
+   // 最后，检查一下类型对不对，不对的话就抛异常，对的话就返回了
+   if (requiredType != null && bean != null && !requiredType.isInstance(bean)) {
+      try {
+         return getTypeConverter().convertIfNecessary(bean, requiredType);
+      }
+      catch (TypeMismatchException ex) {
+         if (logger.isDebugEnabled()) {
+            logger.debug("Failed to convert bean '" + name + "' to required type '" +
+                  ClassUtils.getQualifiedName(requiredType) + "'", ex);
+         }
+         throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());
+      }
+   }
+   return (T) bean;
+}
+```
 
 #### 参考
 
