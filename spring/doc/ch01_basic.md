@@ -148,7 +148,7 @@ protected ConfigurableEnvironment createEnvironment() {
 
 Environment的继承体系:
 
-![](img/Environment.jpg)
+![pic](img/Environment.jpg)
 
 其主要和profile、Property相关。
 
@@ -190,7 +190,7 @@ public AbstractEnvironment() {
 
 构造函数涉及到的PropertySources的继承体系:
 
-![](img/PropertySources.jpg)
+![pic](img/PropertySources.jpg)
 
 默认的MutablePropertySources实现内部含有一个CopyOnWriteArrayList作为存储载体。
 
@@ -212,9 +212,7 @@ protected void customizePropertySources(MutablePropertySources propertySources) 
 
 使用了`PropertySource`表示键值对的信息，继承体系是:
 
-![](img/PropertySource.jpg)
-
-**插注: Environment部分 结束**
+![pic](img/PropertySource.jpg)
 
 开始处理路径占位符。
 
@@ -374,7 +372,7 @@ protected final void refreshBeanFactory() throws BeansException {
 
 创建的BeanFactory实际上就是Bean容器，继承体系是:
 
-![](img/BeanFactory.jpg)
+![pic](img/BeanFactory.jpg)
 
 到这里，我们回看`ApplicationContext``，ApplicationContext` 继承自 `BeanFactory`，但是它不应该被理解为 `BeanFactory` 的实现类，而是说其内部持有一个实例化的 `BeanFactory`（`DefaultListableBeanFactory`）。以后所有的 `BeanFactory` 相关的操作其实是委托给这个实例来处理的。
 
@@ -425,9 +423,9 @@ protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) {
 
 其中 `EntityResolver` 和 `BeanDefinitionReader`，他们的继承体系是:
 
-![](img/EntityResolver.jpg)
+![pic](img/EntityResolver.jpg)
 
-![](img/BeanDefinitionReader.jpg)
+![pic](img/BeanDefinitionReader.jpg)
 
 下一步，路径解析(Ant)
 
@@ -677,7 +675,7 @@ delegate的作用在于处理beans标签的嵌套，其实Spring配置文件是�
 
 下一步，有两个分支: `parseDefaultEAuthoredlement(ele, delegate);`和`delegate.parseCustomElement(root);`。
 
-`parseDefaultElement(ele, delegate)` 代表解析的节点是 <import />、<alias />、<bean />、<beans /> 这几个。
+`parseDefaultElement(ele, delegate)` 代表解析的节点是 `<import />`、`<alias />`、`<bean />`、`<beans />` 这几个。
 
 xml(schema)的命名空间其实类似于java的包名，命名空间采用URL，比如Spring的是这样:
 
@@ -929,11 +927,11 @@ public void registerBeanDefinition(String beanName, BeanDefinition beanDefinitio
 
 `BeanDefiniton`数据结构:
 
-![](img/BeanDefinition.jpg)
+![pic](img/BeanDefinition.jpg)
 
 `BeanFactory`数据结构:
 
-![](Beanfactory_structure.jpg)
+![pic](Beanfactory_structure.jpg)
 
 BeanDefinition 的接口定义:
 
@@ -1412,6 +1410,196 @@ protected <T> T doGetBean(
    return (T) bean;
 }
 ```
+
+接下来当然是分析 createBean 方法：
+
+到一个新的类了 AbstractAutowireCapableBeanFactory，看类名，AutowireCapable？
+
+```java
+/**
+ * Central method of this class: creates a bean instance,
+ * populates the bean instance, applies post-processors, etc.
+ * @see #doCreateBean
+ */
+@Override
+protected Object createBean(String beanName, RootBeanDefinition mbd, Object[] args) throws BeanCreationException {
+   if (logger.isDebugEnabled()) {
+      logger.debug("Creating instance of bean '" + beanName + "'");
+   }
+   RootBeanDefinition mbdToUse = mbd;
+
+   // 确保 BeanDefinition 中的 Class 被加载
+   Class<?> resolvedClass = resolveBeanClass(mbd, beanName);
+   if (resolvedClass != null && !mbd.hasBeanClass() && mbd.getBeanClassName() != null) {
+      mbdToUse = new RootBeanDefinition(mbd);
+      mbdToUse.setBeanClass(resolvedClass);
+   }
+
+   // 准备方法覆写，这里又涉及到一个概念：MethodOverrides，它来自于 bean 定义中的 <lookup-method />
+   // 和 <replaced-method />，如果读者感兴趣，回到 bean 解析的地方看看对这两个标签的解析。
+   // 我在附录中也对这两个标签的相关知识点进行了介绍，读者可以移步去看看
+   try {
+      mbdToUse.prepareMethodOverrides();
+   }
+   catch (BeanDefinitionValidationException ex) {
+      throw new BeanDefinitionStoreException(mbdToUse.getResourceDescription(),
+            beanName, "Validation of method overrides failed", ex);
+   }
+
+   try {
+      // 让 InstantiationAwareBeanPostProcessor 在这一步有机会返回代理，
+      // 在 《Spring AOP 源码分析》那篇文章中有解释，这里先跳过
+      Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
+      if (bean != null) {
+         return bean;
+      }
+   }
+   catch (Throwable ex) {
+      throw new BeanCreationException(mbdToUse.getResourceDescription(), beanName,
+            "BeanPostProcessor before instantiation of bean failed", ex);
+   }
+   // 重头戏，创建 bean
+   Object beanInstance = doCreateBean(beanName, mbdToUse, args);
+   if (logger.isDebugEnabled()) {
+      logger.debug("Finished creating instance of bean '" + beanName + "'");
+   }
+   return beanInstance;
+}
+```
+
+继续往里看 doCreateBean 这个方法：
+
+```java
+/**
+ * Actually create the specified bean. Pre-creation processing has already happened
+ * at this point, e.g. checking {@code postProcessBeforeInstantiation} callbacks.
+ * <p>Differentiates between default bean instantiation, use of a
+ * factory method, and autowiring a constructor.
+ * @param beanName the name of the bean
+ * @param mbd the merged bean definition for the bean
+ * @param args explicit arguments to use for constructor or factory method invocation
+ * @return a new instance of the bean
+ * @throws BeanCreationException if the bean could not be created
+ * @see #instantiateBean
+ * @see #instantiateUsingFactoryMethod
+ * @see #autowireConstructor
+ */
+protected Object doCreateBean(final String beanName, final RootBeanDefinition mbd, final Object[] args)
+      throws BeanCreationException {
+
+   // Instantiate the bean.
+   BeanWrapper instanceWrapper = null;
+   if (mbd.isSingleton()) {
+      instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
+   }
+   if (instanceWrapper == null) {
+      // 说明不是 FactoryBean，这里实例化 Bean，这里非常关键，细节之后再说
+      instanceWrapper = createBeanInstance(beanName, mbd, args);
+   }
+   // 这个就是 Bean 里面的 我们定义的类 的实例，很多地方我直接描述成 "bean 实例"
+   final Object bean = (instanceWrapper != null ? instanceWrapper.getWrappedInstance() : null);
+   // 类型
+   Class<?> beanType = (instanceWrapper != null ? instanceWrapper.getWrappedClass() : null);
+   mbd.resolvedTargetType = beanType;
+
+   // 建议跳过吧，涉及接口：MergedBeanDefinitionPostProcessor
+   synchronized (mbd.postProcessingLock) {
+      if (!mbd.postProcessed) {
+         try {
+            // MergedBeanDefinitionPostProcessor，这个我真不展开说了，直接跳过吧，很少用的
+            applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
+         }
+         catch (Throwable ex) {
+            throw new BeanCreationException(mbd.getResourceDescription(), beanName,
+                  "Post-processing of merged bean definition failed", ex);
+         }
+         mbd.postProcessed = true;
+      }
+   }
+
+   // Eagerly cache singletons to be able to resolve circular references
+   // even when triggered by lifecycle interfaces like BeanFactoryAware.
+   // 下面这块代码是为了解决循环依赖的问题，以后有时间，我再对循环依赖这个问题进行解析吧
+   boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
+         isSingletonCurrentlyInCreation(beanName));
+   if (earlySingletonExposure) {
+      if (logger.isDebugEnabled()) {
+         logger.debug("Eagerly caching bean '" + beanName +
+               "' to allow for resolving potential circular references");
+      }
+      addSingletonFactory(beanName, new ObjectFactory<Object>() {
+         @Override
+         public Object getObject() throws BeansException {
+            return getEarlyBeanReference(beanName, mbd, bean);
+         }
+      });
+   }
+
+   // Initialize the bean instance.
+   Object exposedObject = bean;
+   try {
+      // 这一步也是非常关键的，这一步负责属性装配，因为前面的实例只是实例化了，并没有设值，这里就是设值
+      populateBean(beanName, mbd, instanceWrapper);
+      if (exposedObject != null) {
+         // 还记得 init-method 吗？还有 InitializingBean 接口？还有 BeanPostProcessor 接口？
+         // 这里就是处理 bean 初始化完成后的各种回调
+         exposedObject = initializeBean(beanName, exposedObject, mbd);
+      }
+   }
+   catch (Throwable ex) {
+      if (ex instanceof BeanCreationException && beanName.equals(((BeanCreationException) ex).getBeanName())) {
+         throw (BeanCreationException) ex;
+      }
+      else {
+         throw new BeanCreationException(
+               mbd.getResourceDescription(), beanName, "Initialization of bean failed", ex);
+      }
+   }
+
+   if (earlySingletonExposure) {
+      //
+      Object earlySingletonReference = getSingleton(beanName, false);
+      if (earlySingletonReference != null) {
+         if (exposedObject == bean) {
+            exposedObject = earlySingletonReference;
+         }
+         else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
+            String[] dependentBeans = getDependentBeans(beanName);
+            Set<String> actualDependentBeans = new LinkedHashSet<String>(dependentBeans.length);
+            for (String dependentBean : dependentBeans) {
+               if (!removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) {
+                  actualDependentBeans.add(dependentBean);
+               }
+            }
+            if (!actualDependentBeans.isEmpty()) {
+               throw new BeanCurrentlyInCreationException(beanName,
+                     "Bean with name '" + beanName + "' has been injected into other beans [" +
+                     StringUtils.collectionToCommaDelimitedString(actualDependentBeans) +
+                     "] in its raw version as part of a circular reference, but has eventually been " +
+                     "wrapped. This means that said other beans do not use the final version of the " +
+                     "bean. This is often the result of over-eager type matching - consider using " +
+                     "'getBeanNamesOfType' with the 'allowEagerInit' flag turned off, for example.");
+            }
+         }
+      }
+   }
+
+   // Register bean as disposable.
+   try {
+      registerDisposableBeanIfNecessary(beanName, bean, mbd);
+   }
+   catch (BeanDefinitionValidationException ex) {
+      throw new BeanCreationException(
+            mbd.getResourceDescription(), beanName, "Invalid destruction signature", ex);
+   }
+
+   return exposedObject;
+}
+```
+
+整个初始化流程完成。
+
+庞大的 Spring 真的引出了很多的概念，希望日后有精力可以慢慢补充一些。
 
 #### 参考
 
