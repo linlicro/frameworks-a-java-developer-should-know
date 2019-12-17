@@ -1,0 +1,5 @@
+<beans>
+    <bean id="simpleBean" class="me.icro.java.spring.ch01_basic.SimpleBean">
+        <property name="message" value="message" />
+    </bean>
+</beans>
