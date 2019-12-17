@@ -84,4 +84,3 @@ public class Sorter {
 * [design-patterns-for-humans](https://github.com/kamranahmedse/design-patterns-for-humans)
 * [strategy-design-pattern-in-java-example-tutorial](https://www.journaldev.com/1754/strategy-design-pattern-in-java-example-tutorial)
 * [策略模式](https://www.runoob.com/design-pattern/strategy-pattern.html)
-
