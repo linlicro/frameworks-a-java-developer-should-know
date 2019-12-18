@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+    <!--目标-->
+    <bean id="subject1" class="me.icro.java.spring.ch02_aop.SubjectImpl"/>
+    <bean id="subject2" class="me.icro.java.spring.ch02_aop.SubjectImpl"/>
+    <!--切面类-->
+    <bean id="PermissionVerification" class="me.icro.java.spring.ch02_aop.PermissionVerification"/>
+
+    <aop:config>
+        <aop:aspect id="do" ref="PermissionVerification">
+            <!--定义切点 使用expression语言 表示该接口中定义的所有方法都会被执行-->
+            <aop:pointcut id="point" expression="execution(* me.icro.java.spring.ch02_aop.Subject.*(..))"/>
+            <!--定义通知-->
+            <aop:before method="canLogin" pointcut-ref="point"/>
+            <aop:after method="saveMessage" pointcut-ref="point"/>
+        </aop:aspect>
+    </aop:config>
+
+</beans>

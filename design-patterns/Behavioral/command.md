@@ -40,7 +40,7 @@ public class Bulb {
 ```java
 /**
  * 命令
- * 
+ *
  * Created by Lin on 2019/12/18.
  */
 public interface Command {
