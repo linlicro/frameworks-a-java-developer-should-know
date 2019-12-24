@@ -1,5 +1,8 @@
 # Redis
 
+> 面试题1: 在项目中缓存如何使用的？缓存如果使用不当会造成什么后果？
+> 面试题2: redis 和 memcached 有啥区别？
+
 Redis可以看成就是一个数据库，与MySQL之类数据库不同的是 数据放在内存中，so 读写很快。
 
 广泛用于缓存，也经常用来做分布式锁，还支持事务 、持久化、LUA脚本、LRU驱动事件、多种集群方案。
@@ -18,6 +21,13 @@ Redis可以看成就是一个数据库，与MySQL之类数据库不同的是 数
 map/guava可作为本地缓存，特点是轻量、快速，当在多实例的情况下，每个实例都会保存一份缓存，这样会出现缓存不一致问题。
 
 Redis作为分布式缓存，在多实例时，各实例共用一份缓存，保证一致性，缺点是程序/架构较为复杂。
+
+## redis 和 memcached 有啥区别
+
+* redis支持更丰富的数据类型（支持更复杂的应用场景）
+* Redis支持数据的持久化，可以将内存中的数据保持在磁盘中，重启的时候可以再次加载进行使用,而Memecache把数据全部存在内存之中。
+* 集群模式：memcached没有原生的集群模式，需要依靠客户端来实现往集群中分片写入数据；但是 redis 目前是原生支持 cluster 模式的.
+* Memcached是多线程，非阻塞IO复用的网络模型；Redis使用单线程的多路 IO 复用模型。
 
 ## Redis的线程模式
 
@@ -319,6 +329,43 @@ public class MyBloomFilter {
 ```
 
 ### Guava中自带的布隆过滤器
+
+```java
+/**
+ * 描述: 利用Google开源的 Guava中自带的布隆过滤器
+ *
+ * @author Lin
+ * @since 2019-12-24 10:58 AM
+ */
+public class GuavaBloomFilter {
+
+    public static void main(String[] args) {
+        // 最多存放 1500个整数的布隆过滤器，容忍的 误判的概率是万分之1
+        BloomFilter<Integer> filter = BloomFilter.create(
+                Funnels.integerFunnel(),
+                1500,
+                0.01);
+        // 判断是否存在
+        System.out.println(filter.mightContain(1));
+        System.out.println(filter.mightContain(2));
+        // 添加
+        filter.put(1);
+        filter.put(2);
+        System.out.println(filter.mightContain(1));
+        System.out.println(filter.mightContain(2));
+    }
+}
+```
+
+Guava 提供的布隆过滤器的实现还是很不错的，但是它有一个重大的缺陷就是只能单机使用（另外，容量扩展也不容易），而现在互联网一般都是分布式的场景。为了解决这个问题，我们就需要用到 Redis 中的布隆过滤器了。
+
+### Redis 中的布隆过滤器
+
+Redis v4.0 之后有了 Module（模块/插件） 功能，Redis Modules 让 Redis 可以使用外部模块扩展其功能 。布隆过滤器就是其中的 Module。
+
+另外，官网推荐了一个 RedisBloom 作为 Redis 布隆过滤器的 Module,地址：<https://github.com/RedisBloom/RedisBloom>。
+
+体验Redis中的布隆过滤器 参考 <https://hub.docker.com/r/redislabs/rebloom/>。
 
 ## 参考
 
