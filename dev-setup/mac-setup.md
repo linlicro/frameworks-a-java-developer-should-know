@@ -1,4 +1,4 @@
-# macOS设置指南
+# macOS 设置指南
 
 ## 系统
 
@@ -6,7 +6,32 @@
 
 ### 系统偏好设置
 
-... 待补充
+安全性与隐私:
+
+* 通用，勾选 进入睡眠后活开始屏幕保护程序`立即`要求输入密码
+
+触发角:
+
+* 系统偏好设置/屏幕保护程序/触发角, 选择(右上桌面，左下启动台，右下启动屏幕保护)
+
+触摸板(Trackpad):
+
+* 选中`轻点来点按`(用起来方便)
+* 修改`辅助点按`为`点按右下角`
+
+程序坞(Docker):
+
+* 大小设置到最小(拖到最左边)，以显示最小图标
+* 选中`自动显示和隐藏程序坞`
+
+键盘(Keyboard):
+
+* 设置`按键重复` 最快
+* 设置`重复前延迟` 最短
+
+节能:
+
+* 系统偏好设置/辅助功能/显示, 勾选 (减弱动态效果、减少透明度)
 
 ## Homebrew
 
@@ -32,7 +57,7 @@ xcode-select --install
 brew doctor
 ```
 
-### 使用手册
+### 使用命令
 
 安装软件:
 
@@ -239,10 +264,133 @@ brew cask install iterm2
 Mac系统自带了zsh，但不是新版的，如果喜欢新版可以通过Homebrew来安装:
 
 ```sh
-brew install zsh
+# 安装 zsh 及 补全
+brew install zsh zsh-completions
 ```
 
-[官网](https://ohmyz.sh/)
+接下来，修改相关配置，在/etc/shells文件中加入如下一行:
+
+```sh
+/usr/local/bin/zsh
+```
+
+然后运行命令
+
+```sh
+chsh -s /usr/local/bin/zsh
+```
+
+注意，zsh的配置文件是`.zshrc`。
+
+下面你需要[Oh My Zsh](https://github.com/robbyrussell/oh-my-zsh) 或者 [Prezto](https://github.com/sorin-ionescu/prezto) 来管理`zsh`的配置，这里选择`oh-my-zsh`。
+
+#### Oh My Zsh
+
+安装
+
+```sh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+```
+
+配置
+
+```sh
+# 设置主题
+ZSH_THEME=pygmalion
+# 设置插件
+plugins=(git colored-man colorize github jira vagrant virtualenv pip python brew osx zsh-syntax-highlighting)
+
+# ls 配色生效
+unset LSCOLORS
+export CLICOLOR=1
+export CLICOLOR_FORCE=1
+
+# 生效
+source ~/.env.sh
+```
+
+其他`插件`、`主题`请参考[oh-my-zsh wiki](https://github.com/ohmyzsh/ohmyzsh/wiki)。
+
+#### env.sh
+
+可以用`env.sh`做些预定义设置，在`~/.zshrc`添加，
+
+```sh
+source ~/<path to file>/env.sh
+```
+
+## Git
+
+Mac有预安装 [Git](https://git-scm.com/)，不过 还是通过Homebrew 来安装。管理Git。
+
+```sh
+brew install git
+
+which git
+```
+
+将得到 `/usr/local/bin/git`。
+
+### 基本配置信息
+
+下载 [.gitconfig](https://raw.githubusercontent.com/nicolashery/mac-dev-setup/master/.gitconfig)
+
+```sh
+cd ~
+curl -O https://raw.githubusercontent.com/nicolashery/mac-dev-setup/master/.gitconfig
+```
+
+以上做个一些基本命令(`status`,`branch`, `diff`)的配色，以及新增一些别名(tags, branches, remotes)。
+
+用户信息配置:
+
+```sh
+git config --global user.name "Your Name Here"
+git config --global user.email "your_email@youremail.com"
+```
+
+添加全部`.gitignore`，小编的工作环境是Mac，需要将`.DS_Store`默认加入每个项目的`.gitignore`。
+
+```sh
+cd ~
+curl -O https://raw.githubusercontent.com/nicolashery/mac-dev-setup/master/.gitignore
+git config --global core.excludesfile ~/.gitignore
+```
+
+常用的gitignore信息 请参见<https://www.gitignore.io/>。
+
+### GitHub配置
+
+... 待补充
+
+## Java 环境
+
+先检查`是否已经安装`:
+
+```sh
+java -version
+```
+
+若得到以下信息，说明本地具有Java的开发环境。
+
+```sh
+java version "1.8.0_74"
+Java(TM) SE Runtime Environment (build 1.8.0_74-b02)
+Java HotSpot(TM) 64-Bit Server VM (build 25.74-b02, mixed mode)
+```
+
+若没有，则参考下面信息安装。
+
+### 通过Oracle官网下载
+
+[Oracle website](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+
+### Homebrew(推荐)
+
+```sh
+brew update
+brew tap caskroom/versions
+```
 
 ## 参考
 
@@ -250,4 +398,3 @@ brew install zsh
 * [macOS Setup Guide](http://sourabhbajaj.com/mac-setup/)
 * [mac-dev-setup](https://github.com/nicolashery/mac-dev-setup)
 * [还在用 Win？教你从零把 Mac 打造成开发利器](https://mp.weixin.qq.com/s/qRzpNHZSL6hnZNwUnoaO1g)
-
