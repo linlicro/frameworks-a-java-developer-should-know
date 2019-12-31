@@ -3,6 +3,7 @@
 > 面试题1: 在项目中缓存如何使用的？缓存如果使用不当会造成什么后果？
 > 面试题2: redis 和 memcached 有啥区别？
 > 面试题3: 为什么redis单线程模型也能这么高效率？
+> 面试题4: 怎么保证redis是高并发以及高可用的？
 
 Redis可以看成就是一个数据库，与MySQL之类数据库不同的是 数据放在内存中，so 读写很快。
 
@@ -384,14 +385,104 @@ Redis 的并发竞争 Key 的问题也就是多个系统同时对一个 key 进�
 
 首推Zookeeper。
 
-## 问题4: 如何保证缓存与数据库双写时的数据一致性?
+## 问题4: 如何保证缓存与数据库双写时的数据一致性
 
 > 只要是双写，就一定会有数据一致性的问题，那么你如何解决一致性问题？
 
-如果你的系统不是严格要求 “缓存+数据库” 必须保持一致性的话，最好不要做这个方案，即：读请求和写请求串行化，串到一个内存队列里去。
+先说说，缓存更新的套路。更新缓存的的Design Pattern有四种：Cache aside, Read through, Write through, Write behind caching。参考[缓存更新的套路](http://coolshell.cn/articles/17416.html)。
+
+### Cache Aside Pattern(最常用的pattern)
+
+* 失效: 应用程序尝试从cache获取数据，没有得到，再从数据库中获取数据，获取到后，放到缓存中。
+* 命中: 应用程序从cache中取数据，获取到就返回
+* 更新: 先更新数据库，成功后，让缓存失效(删除)
+
+![reading data using cache aside pattern](img/redis-reading-data-using-cache-aside-design-pattern-flow.png)
+
+![updating data using cache aside pattern](img/redis-updating-data-using-the-Cache-Aside-Pattern-Flow.png)
+
+### Read/Write Through Pattern
+
+Read/Write Through套路是把更新数据库（Repository）的操作由缓存自己代理了，所以，对于应用层来说，就简单很多了。可以理解为，应用认为后端就是一个单一的存储，而存储自己维护自己的Cache。
+
+### Write Behind Caching Pattern
+
+在更新数据的时候，只更新缓存，不更新数据库，而我们的缓存会异步地批量更新数据库。
+
+Cache Aside这个还是会有有并发问题，出现的概率可能非常低。为解决这个低概率的并发问题，可以考虑读请求和写请求串行化。
+
+但，如果你的系统不是严格要求 “缓存+数据库” 必须保持一致性的话，最好不要做这个方案，即：读请求和写请求串行化，串到一个内存队列里去。
 
 参考： Java工程师面试突击第1季
+
+## 问题5: 怎么保证redis是高并发以及高可用的/主从原理/哨兵原理
+
+* redis 单机能承受多少并发？大概能够承受的QPS是 上万到几万(根据具体的业务操作而定)。单机的瓶颈在于`单机`。
+* 如果单机扛不住，如何扩容？首先，做`读写分离`，一般都是用来支撑读高并发，写请求比较少。优势: 支持水平扩容，如果读QPS增加，只需要增加redis(slave)就行了。
+* 怎么保证redis的高可用性？
+
+### redis replication 主从复制
+
+![redis replication](img/redis_replication.png)
+
+* 一个master可以有多个slave
+* 一个slave只能有一个master
+* 数据流是单向的，master到slave
+
+#### 核心机制
+
+* redis采用异步方式复制数据到slave节点，redis 2.8开始，slave node会周期性地确认自己每次复制的数据量
+* 一个master node是可以配置多个slave node的
+* slave node也可以连接其他的slave node
+* slave node做复制的时候，是不会block master node的正常工作的
+* slave node在做复制的时候，也不会block对自己的查询操作，它会用旧的数据集来提供服务; 但是复制完成的时候，需要删除旧数据集，加载新数据集，这个时候就会暂停对外服务了
+* slave node主要用来进行横向扩容，做读写分离，扩容的slave node可以提高读的吞吐量
+
+#### master持久化(安全保障)
+
+如果采用了主从架构，建议必须开启master的持久化。
+
+故障点: 若master没有开启持久化，出现宕机时，重启后，没有本地数据可以恢复，认为自己的数据是空的，然后同步给slave，salve nodes的数据也将丢失了。
+
+## 使用场景
+
+### 热点数据
+
+存取数据优先从 Redis 操作，如果不存在再从文件（例如 MySQL）中操作，从文件操作完后将数据存储到 Redis 中并返回。同时有个定时任务后台定时扫描 Redis 的 key，根据业务规则进行淘汰，防止某些只访问一两次的数据一直存在 Redis 中。
+
+> 如使用 Zset 数据结构，存储 Key 的访问次数/最后访问时间作为 Score，最后做排序，来淘汰那些最少访问的 Key。
+
+### 会话维持 Session
+
+会话维持 Session 场景，即使用 Redis 作为分布式场景下的登录中心存储应用。每次不同的服务在登录的时候，都会去统一的 Redis 去验证 Session 是否正确。但是在微服务场景，一般会考虑 Redis + JWT 做 Oauth2 模块。
+
+### 分布式锁 SETNX
+
+命令格式：SETNX key value：当且仅当 key 不存在，将 key 的值设为 value。若给定的 key 已经存在，则 SETNX 不做任何动作。
+
+待补充...Redlock
+
+### 表缓存
+
+Redis 缓存表的场景有黑名单、禁言表等。访问频率较高，即读高。根据业务需求，可以使用后台定时任务定时刷新 Redis 的缓存表数据。
+
+### 消息队列 list
+
+主要使用了 List 数据结构。
+List 支持在头部和尾部操作，因此可以实现简单的消息队列。
+
+* 发消息：在 List 尾部塞入数据。
+* 消费消息：在 List 头部拿出数据。
+
+同时可以使用多个 List，来实现多个队列，根据不同的业务消息，塞入不同的 List，来增加吞吐量。
+
+### 计数器 string
+
+主要使用了 INCR、DECR、INCRBY、DECRBY 方法。
+
+INCR key：给 key 的 value 值增加一 DECR key：给 key 的 value 值减去一
 
 ## 参考
 
 * [JavaGuide](https://github.com/Snailclimb/JavaGuide)
+* [Redis's documentation](https://redis.io/documentation)
