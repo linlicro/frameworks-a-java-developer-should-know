@@ -319,6 +319,29 @@ source ~/.env.sh
 source ~/<path to file>/env.sh
 ```
 
+添加配置信息(个人的配置，大伙自定义):
+
+```sh
+#!/bin/zsh
+
+# Add commonly used folders to $PATH
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+# Specify default editor. Possible values: vim, nano, ed etc.
+export EDITOR=vim
+
+# File search functions
+function f() { find . -iname "*$1*" ${@:2} }
+function r() { grep "$1" ${@:2} -R . }
+
+# Create a folder and move into it in one command
+function mkcd() { mkdir -p "$@" && cd "$_"; }
+
+# Example aliases
+alias cppcompile='c++ -std=c++11 -stdlib=libc++'
+alias g='git'
+```
+
 ## Git
 
 Mac有预安装 [Git](https://git-scm.com/)，不过 还是通过Homebrew 来安装。管理Git。
@@ -391,6 +414,104 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.74-b02, mixed mode)
 brew update
 brew tap caskroom/versions
 ```
+
+安装 java 9:
+
+```sh
+brew cask install java
+```
+
+或者，安装java 8:
+
+```sh
+brew cask install java8
+```
+
+### 设置`JAVA_HOME`
+
+往`env.sh`添加环境变量 `JAVA_HOME`:
+
+```sh
+export JAVA_HOME="`/usr/libexec/java_home -v 1.8`"
+```
+
+或者，你使用Java 9:
+
+```sh
+export JAVA_HOME="`/usr/libexec/java_home -v 9`"
+```
+
+Java开发IDE推荐[IntelliJ](https://www.jetbrains.com/idea/download/)
+
+## Visual Studio Code
+
+[Visual Studio Code](https://code.visualstudio.com/) 是一款免费开源的现代化轻量级代码编辑器，支持几乎所有主流的开发语言的语法高亮、智能代码补全、自定义热键、括号匹配、代码片段、代码对比 Diff、GIT 等特性，支持[插件扩展](https://code.visualstudio.com/docs/editor/extension-gallery)，并针对网页开发和云端应用开发做了优化。
+
+### vscode 安装
+
+使用`Homebrew`方式来安装:
+
+```sh
+brew cask install visual-studio-code
+```
+
+也可以通过[下载](https://code.visualstudio.com/Download)来安装。
+
+Note: 建议在`程序坞`保留Visual Studio Code(和iterm一样)，右击Docker中的图标 **选项 > 在程序坞中保留**。
+
+### vscode 配置
+
+进入**Code > Preferences > Settings**(快捷键是 **Cmd + ,**)，然后在右上角点击`打开设置(json)`，粘贴以下配置信息(参考):
+
+```json
+{
+    "files.autoSave": "afterDelay",
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "editor.formatOnPaste": true,
+    "editor.tabSize": 2,
+    "editor.rulers": [
+        80
+    ],
+    "workbench.editor.enablePreview": false
+}
+```
+
+以上方式可以在你的新设备，快速配置vscode。日常修改配置时，你可以通过配置(ui)的搜索功能，快速定位配置项来做修改。
+
+### 配置命令行中打开
+
+如果你只想记住一个vscode的快捷键，那它会是`Cmd+Shift+P(⇧ ⌘ P)`，用来打开`命令面板`。
+
+接着，马上使用下`命令面板`来安装插件，用来通过[`终端命令`快速打开VS Code](https://code.visualstudio.com/docs/setup/mac#_launching-from-the-command-line)。
+
+`Cmd+Shift+P` > `Shell Command: Install 'code' command in PATH`。
+
+这样，你可以在终端直接打开项目:
+
+```sh
+cd myproject/
+code . ## 打开文件夹
+
+code myfile.txt ## 打开文件
+```
+
+### vscode 插件安装
+
+* Chinese (Simplified) Language Pack for Visual Studio Code(本地化)
+* markdownlint(markdown格式检查器)
+* atom one dark theme(ATOM 风格主题)
+* one dark pro(主题)
+* material theme(主题)
+* vscode-icons(图标)
+
+#### vscode python 解释器选择
+
+`Cmd+Shift+P(⇧ ⌘ P)` > `select interpreter`
+
+#### python 编程
+
+[Editing Python in Visual Studio Code](https://code.visualstudio.com/docs/python/editing)
 
 ## 参考
 
