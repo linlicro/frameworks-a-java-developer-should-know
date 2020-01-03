@@ -534,7 +534,7 @@ brew install vim
 
 提供两个版本:
 
-* The Basic
+* The Basic 基础版本
 * The Awesome
 
 #### 安装 Awesome 版本
