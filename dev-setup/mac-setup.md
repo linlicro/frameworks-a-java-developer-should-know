@@ -504,6 +504,7 @@ code myfile.txt ## 打开文件
 * one dark pro(主题)
 * material theme(主题)
 * vscode-icons(图标)
+* Image preview(图片预览: 光标悬浮在图片路径上时显示)
 
 #### vscode python 解释器选择
 
@@ -512,6 +513,51 @@ code myfile.txt ## 打开文件
 #### python 编程
 
 [Editing Python in Visual Studio Code](https://code.visualstudio.com/docs/python/editing)
+
+## Vim
+
+虽然VS Code将是我们的主要编辑器，但日常工作中还需掌握[Vim](https://www.vim.org/)的基本用法。
+
+Vim是一个高度可配置的文本编辑器，用于高效地创建和更改任何类型的文本。
+
+### Vim 安装
+
+通过`homebrew`安装最新版:
+
+```sh
+brew install vim
+```
+
+### vimrc - The Ultimate vimrc
+
+[The Ultimate vimrc](https://github.com/amix/vimrc) 是史上最强、最全的vimrc配置。
+
+提供两个版本:
+
+* The Basic
+* The Awesome
+
+#### 安装 Awesome 版本
+
+```sh
+git clone --depth=1 https://github.com/amix/vimrc.git ~/.vim_runtime
+sh ~/.vim_runtime/install_awesome_vimrc.sh
+```
+
+#### 安装 Basic 版本
+
+```sh
+git clone --depth=1 https://github.com/amix/vimrc.git ~/.vim_runtime
+sh ~/.vim_runtime/install_basic_vimrc.sh
+```
+
+### 更新 amix/vimrc.git
+
+```sh
+cd ~/.vim_runtime
+git pull --rebase
+python update_plugins.py
+```
 
 ## 参考
 
