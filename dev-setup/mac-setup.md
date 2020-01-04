@@ -280,7 +280,7 @@ brew install zsh zsh-completions
 chsh -s /usr/local/bin/zsh
 ```
 
-注意，zsh的配置文件是`.zshrc`。
+注意，zsh的配置文件是`.zshrc`。`~/.bash_profile`将不再被加载，该文件是默认shell(bash)的配置文件。
 
 下面你需要[Oh My Zsh](https://github.com/robbyrussell/oh-my-zsh) 或者 [Prezto](https://github.com/sorin-ionescu/prezto) 来管理`zsh`的配置，这里选择`oh-my-zsh`。
 
@@ -385,6 +385,109 @@ git config --global core.excludesfile ~/.gitignore
 ### GitHub配置
 
 ... 待补充
+
+## Python
+
+MacOS自身已经带有[Python](https://python.org/)，这个Python主要用于支持系统文件和XCode，我们为了不跟系统的混淆，安装自己所需的Python吧。
+
+安装方式有两种:
+
+* Homebrew
+* Pyenv - Python 版本管理工具
+
+### 安装 Homebrew方式
+
+```sh
+brew install python # Python 3(default)
+
+brew install python@2 # Python 2.7
+```
+
+### 安装 通过Pyenv方式
+
+通过 [Pyenv](https://github.com/pyenv/pyenv) 方式来安装，为方便管理不同版本的Python。
+
+```sh
+brew install pyenv
+```
+
+配置环境变量:
+
+```sh
+echo 'eval "$(pyenv init -)"' >> ~/.zshrc
+eval "$(pyenv virtualenv-init -)" >> ~/.zshrc
+# 如果使用默认的shell，添加配置至 ~/.bash_profile
+```
+
+根据[pyenv wiki](https://github.com/pyenv/pyenv/wiki)建议，安装一些依赖:
+
+```sh
+brew install openssl readline sqlite3 xz zlib
+```
+
+### pyenv 常用命令
+
+```sh
+pyenv commands # 显示所有可用命令
+
+pyenv install --list # list all available Python versions
+
+pyenv install 3.x.x # look for the latest 3.x version, and install it (replace the .x.x with actual numbers)
+
+pyenv versions # list the Python versions you have locally with
+
+pyenv shell 3.x.x # switch your current terminal to another Python version
+
+pyenv global 3.6.8 # use the global command to set global version(s) of Python to be used in all shells.
+pyenv rehash
+
+pyenv local 3.x.x # 独立项目的python版本设置，保存在项目目录里的`.python-version`
+
+pyenv virtualenv 3.6.8 env-3.6.8 # 创建虚拟环境
+pyenv activate env-3.6.8 # 激活虚拟环境
+pyenv deactivate #退出虚拟环境
+```
+
+全部命令参见 [pyenv commands](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md)。
+
+### pip python包管理
+
+Python安装时，同时会安装[pip](https://pip.pypa.io/en/stable/)。
+
+#### pip 配置文件
+
+```sh
+# 创建 pip 配置目录
+mkdir ~/.pip
+
+# 编辑配置
+vim ~/.pip/.pip.conf
+
+# 添加以下内容
+[list]
+format=columns
+[global]
+download_cache = ~/.cache/pip
+index-url = http://mirrors.aliyun.com/pypi/simple/
+[install]
+trusted-host=mirrors.aliyun.com
+```
+
+#### pip 常用命令
+
+```sh
+pip install <package> # to install a Python package
+
+pip install --upgrade <package> # to upgrade a package
+
+pip freeze # to see what's installed
+
+pip uninstall <package> # to uninstall a package
+```
+
+### virtualenv
+
+[virtualenv](https://virtualenv.pypa.io/) is a tool that creates an isolated Python environment for each of your projects.
 
 ## Java 环境
 
@@ -564,4 +667,5 @@ python update_plugins.py
 * [awesome-mac](https://github.com/jaywcjlove/awesome-mac/blob/master/README-zh.md)
 * [macOS Setup Guide](http://sourabhbajaj.com/mac-setup/)
 * [mac-dev-setup](https://github.com/nicolashery/mac-dev-setup)
+* [使用 pyenv 管理 Python 版本](http://einverne.github.io/post/2017/04/pyenv.html)
 * [还在用 Win？教你从零把 Mac 打造成开发利器](https://mp.weixin.qq.com/s/qRzpNHZSL6hnZNwUnoaO1g)
