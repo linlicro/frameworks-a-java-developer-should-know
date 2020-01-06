@@ -37,7 +37,7 @@
 
 [Homebrew](https://brew.sh/) calls itself The missing package manager for macOS and is an essential tool for any developer. 小编注: macOS缺失的软件包的管理器，通过命令行安装 Mac 软件的工具(大部分是命令行工具)。
 
-### 安装
+### Homebrew的安装
 
 安装依赖:
 
@@ -57,7 +57,7 @@ xcode-select --install
 brew doctor
 ```
 
-### 使用命令
+### Homebrew的常用命令
 
 安装软件:
 
@@ -344,7 +344,7 @@ alias g='git'
 
 ## Git
 
-Mac有预安装 [Git](https://git-scm.com/)，不过 还是通过Homebrew 来安装。管理Git。
+Mac有预安装 [Git](https://git-scm.com/)，不过 还是通过Homebrew 来安装、管理Git。
 
 ```sh
 brew install git
@@ -430,16 +430,18 @@ brew install openssl readline sqlite3 xz zlib
 ```sh
 pyenv commands # 显示所有可用命令
 
-pyenv install --list # list all available Python versions
+pyenv install --list # 查看可安装 Python 版本
 
 pyenv install 3.x.x # look for the latest 3.x version, and install it (replace the .x.x with actual numbers)
+pyenv uninstall 3.x.x
 
-pyenv versions # list the Python versions you have locally with
+pyenv versions # 查看本机安装 Python 版本
 
-pyenv shell 3.x.x # switch your current terminal to another Python version
+pyenv shell 3.x.x # 设置面向 shell 的 Python 版本，通过设置当前 shell 的 PYENV_VERSION 环境变量的方式。这个版本的优先级比 local 和 global 都要高。–unset 参数可以用于取消当前 shell 设定的版本。
+pyenv shell --unset
 
-pyenv global 3.6.8 # use the global command to set global version(s) of Python to be used in all shells.
-pyenv rehash
+pyenv global 3.6.8 # 设置全局的 Python 版本，通过将版本号写入 ~/.pyenv/version 文件的方式
+pyenv rehash # 创建垫片路径
 
 pyenv local 3.x.x # 独立项目的python版本设置，保存在项目目录里的`.python-version`
 
@@ -449,6 +451,16 @@ pyenv deactivate #退出虚拟环境
 ```
 
 全部命令参见 [pyenv commands](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md)。
+
+### pyenv 安装慢问题
+
+pyenv install 下载非常慢甚至卡住，还会出错`error: failed to download`。
+
+加速方式:
+
+* 使用淘宝镜像源加速：<https://npm.taobao.org/mirrors/python/>
+* 下载需要的版本放到~/.pyenv/cache文件夹下面
+* 然后执行 pyenv install 版本号 安装对应的python版本
 
 ### pip python包管理
 
@@ -488,6 +500,8 @@ pip uninstall <package> # to uninstall a package
 ### virtualenv
 
 [virtualenv](https://virtualenv.pypa.io/) is a tool that creates an isolated Python environment for each of your projects.
+
+pyenv 插件：pyenv-virtualenv
 
 ## Java 环境
 
@@ -661,6 +675,85 @@ cd ~/.vim_runtime
 git pull --rebase
 python update_plugins.py
 ```
+
+## Sublime Text
+
+[Sublime Text](http://www.sublimetext.com/) 是广泛使用到的编辑器，官方定义: a sophisticated text editor for code, markup and prose.
+
+### 安装
+
+与常规App安装一样，前往官网[下载](http://www.sublimetext.com/)，拖拽至`Applications`文件夹。
+
+### 设置CLI方式打开文件
+
+```sh
+ln -s /Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl /usr/local/bin/subl
+```
+
+然后，你可以在终端快速打开文件 `subl myfile.py`，或者打开当前目录 `subl .`。
+
+### Sublime Text 设置
+
+偏好设置，这是一份基础开发配置(参考):
+
+```json
+{
+    "auto_complete_delay": 5,
+    "auto_complete_selector": "source, text",
+    "color_scheme": "Packages/User/Monokai (SL).tmTheme",
+    "create_window_at_startup": false,
+    "folder_exclude_patterns":
+    [
+        ".svn",
+        ".git",
+        ".DS_Store",
+        "__pycache__",
+        "*.pyc",
+        "*.pyo",
+        "*.exe",
+        "*.dll",
+        "*.obj",
+        "*.o",
+        "*.a",
+        "*.lib",
+        "*.so",
+        "*.dylib",
+        "*.ncb",
+        "*.sdf",
+        "*.suo",
+        "*.pdb",
+        "*.idb",
+        "*.psd"
+    ],
+    "font_face": "Source Code Pro",
+    "font_size": 13,
+    "ignored_packages":
+    [
+        "Markdown",
+        "Vintage"
+    ],
+    "open_files_in_new_window": false,
+    "rulers":
+    [
+        80
+    ],
+    "translate_tabs_to_spaces": true,
+    "word_wrap": true
+}
+```
+
+### 安装 Package Control
+
+Package Control 可方便管理Sublime text的插件，最方便的安装方式是 如下:
+
+* 打开`Console`: ctrl+\` 快捷键 或者通过菜单 `View > Show Console`打开
+* 参考<https://packagecontrol.io/installation> 执行相关命令
+
+推荐的插件有:
+
+* [Git](https://github.com/kemayo/sublime-text-git): Plugin for some Git integration
+* [SublimeLinter](https://sublimelinter.readthedocs.io/en/stable/): Interactive code linting framework for Sublime Text 3
+* [IndentXML](https://github.com/alek-sys/sublimetext_indentxml): Plugin for re-indenting XML and JSON files
 
 ## 参考
 
