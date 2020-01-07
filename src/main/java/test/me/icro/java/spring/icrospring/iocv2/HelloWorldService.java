@@ -19,6 +19,10 @@ public class HelloWorldService {
         this.text = text;
     }
 
+    public void helloWorld() {
+        System.out.println(this.text);
+    }
+
     public HelloWorldService2 getHelloWorldService2() {
         return helloWorldService2;
     }
