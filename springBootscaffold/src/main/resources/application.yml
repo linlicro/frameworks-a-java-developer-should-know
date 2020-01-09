@@ -1,0 +1,3 @@
+# 配置日志框架
+logging:
+  config: classpath:log4j2-spring.xml
