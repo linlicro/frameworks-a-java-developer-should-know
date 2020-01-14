@@ -7,7 +7,8 @@ import java.util.Set;
 /**
  * redis的工具类
  *
- * Created by Lin on 2020/1/9.
+ * @author Lin
+ * @date 2020/1/9
  */
 public interface RedisUtils {
 
@@ -99,7 +100,7 @@ public interface RedisUtils {
     Map<Object, Object> hmget(String key);
 
     /**
-     *
+     * HashSet
      * @param key 键
      * @param map 对应多个键值
      * @return true 成功 false失败

@@ -11,3 +11,12 @@ spring:
           max-active: 8
       timeout: 5000ms
       password: # 密码，如果没有的话，不用输入
+    # mysql的配置
+    datasource:
+      url:
+      username:
+      password:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      type: com.zaxxer.hikari.HikariDataSource
+      initialization-mode: always
+      continue-on-error: true

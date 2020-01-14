@@ -10,7 +10,7 @@
     <!-- 全局参数 -->
     <Properties>
         <!-- 配置日志文件输出目录 -->
-        <Property name="LOG_HOME">/root/logs/since</Property>
+        <Property name="LOG_HOME">/tmp/me.icro.java.springBoot-scaffold</Property>
         <!-- 日志输出名字 -->
         <Property name="FILE_NAME_INFO">mini-program-info</Property>
         <Property name="FILE_NAME_WARN">mini-program-warn</Property>

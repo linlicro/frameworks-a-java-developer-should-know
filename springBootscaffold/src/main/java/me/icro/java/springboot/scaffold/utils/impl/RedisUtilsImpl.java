@@ -82,7 +82,7 @@ public class RedisUtilsImpl implements RedisUtils {
             return;
         }
 
-        if (0 < key.length) {
+        if (1 == key.length) {
             redisTemplate.delete(key[0]);
         } else {
             redisTemplate.delete(Arrays.asList(key));
@@ -99,7 +99,9 @@ public class RedisUtilsImpl implements RedisUtils {
      */
     @Override
     public Object get(String key) {
-        if (null == key) return null;
+        if (null == key) {
+            return null;
+        }
 
         return redisTemplate.opsForValue().get(key);
     }
@@ -404,7 +406,7 @@ public class RedisUtilsImpl implements RedisUtils {
             return 0;
         }
     }
-    
+
 // ==============List====================
 
     /**
