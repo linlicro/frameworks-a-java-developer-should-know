@@ -25,6 +25,13 @@ public class RedisUtilsImplTest extends ScaffoldApplicationTests {
 
     @Test
     public void testString() throws Exception {
+        /**
+         * 测试点:
+         * * redis是否支持多并发
+         * * key-value 的简单操作
+         * * key-value 其中value是自定义类
+         * * 删除
+         */
         try {
             ExecutorService executorService = Executors.newFixedThreadPool(1000);
             IntStream.range(0, 1000).forEach(i -> executorService.execute(() -> redisUtils.incr("count", 1)));
@@ -61,6 +68,9 @@ public class RedisUtilsImplTest extends ScaffoldApplicationTests {
 
     @Test
     public void expire() throws Exception {
+        /**
+         * 过期时间操作 测试
+         */
         try {
             redisUtils.set("var1", "val1", 10);
             Assert.assertEquals(10, redisUtils.getExpire("var1"));

@@ -4,11 +4,14 @@ spring boot scaffold(脚手架) 集成redis、pagehelper、mybatis、log4j2、dr
 
 -[x] redis
 -[x] log4j2
--[ ] mybatis
--[ ] pagehelper
+-[ ] aopLog(通过AOP记录web请求日志)
+-[ ] mybatis & 通用Mapper & PageHelper(通用的Mybatis分页插件) & mybatis-plus(快速操作Mybatis)
 -[ ] druid
+-[ ] Dubbo(采用官方的starter)
 -[ ] jwt
 -[ ] mail
+-[ ] actuator(监控)
+-[ ] admin(可视化的监控)
 -[ ] Spring Boot CLI: CLI自动生成
 
 ## 日志 log4j2
@@ -56,3 +59,15 @@ Lettuce的连接是基于Netty的，连接实例可以在多个线程间共享�
 * [Caching Data with Spring](https://spring.io/guides/gs/caching/)
 * [Spring Data Redis](https://docs.spring.io/spring-data/redis/docs/2.0.1.RELEASE/reference/html/)
 * [redis 中文文档](http://www.redis.cn/commands.html)
+
+## Dubbo
+
+## 全局异常
+
+* 使用 `@ControllerAdvice` 和 `@ExceptionHandler` 处理全局异常，使用@ControllerAdvice注解 可以通过 assignableTypes 指定特定的类，让异常处理类只处理特定类抛出的异常。
+* 使用`@ExceptionHandler` 处理 `Controller` 级别的异常。
+* 使用 `ResponseStatusException` 更加方便, 可以避免我们额外的异常类。
+
+### 参考
+
+* [actuator文档](https://docs.spring.io/spring-boot/docs/2.0.5.RELEASE/reference/htmlsingle/#production-ready)
