@@ -1,32 +1,46 @@
 package me.icro.java.springboot.scaffold.exception;
 
-import me.icro.java.springboot.scaffold.controller.ExceptionController;
+import lombok.extern.slf4j.Slf4j;
+import me.icro.java.springboot.scaffold.exception.constant.Status;
+import me.icro.java.springboot.scaffold.model.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.HashSet;
 
 /**
- * 描述: 异常处理类
+ * 描述: 全局异常处理类
  *
  * @author Lin
- * @since 2020-01-15 10:52 AM
+ * @since 2020-01-15 3:56 PM
  */
-@ControllerAdvice(assignableTypes = {ExceptionController.class})
-@ResponseBody
+@ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
-    private ErrorResponse illegalArgumentResponse = new ErrorResponse(new IllegalArgumentException("参数错误!"));
-    private ErrorResponse resourceNotFoundResponse = new ErrorResponse(new ResourceNotFoundException("the resource Not Found!"));
-
-    @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ErrorResponse> exceptionHandler(Exception e) {
-        if (e instanceof IllegalArgumentException) {
-            return ResponseEntity.status(400).body(illegalArgumentResponse);
-        } else if (e instanceof ResourceNotFoundException) {
-            return ResponseEntity.status(404).body(resourceNotFoundResponse);
-        } else {
-            return null;
+    private static HashSet<Integer> HTTP_STATU_CODE_SET = new HashSet<>();
+    static {
+        for (Status status : Status.values()) {
+            HTTP_STATU_CODE_SET.add(status.getCode());
         }
     }
+
+    /**
+     * 统一的json异常处理
+     *
+     * @param exception
+     * @return
+     */
+    @ExceptionHandler(value = JsonException.class)
+    public ResponseEntity<ApiResponse> jsonExceptionHandler(JsonException exception) {
+        log.error("JsonException: {}.\nException details: {}", exception.getMessage(), exception);
+
+        if (HTTP_STATU_CODE_SET.contains(exception.getCode())) {
+            return ResponseEntity.status(exception.getCode()).body(ApiResponse.ofException(exception));
+        } else {
+            return ResponseEntity.status(Status.ERROR.getCode()).body(ApiResponse.ofException(exception));
+        }
+    }
+
 }

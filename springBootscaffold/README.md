@@ -60,13 +60,15 @@ Lettuce的连接是基于Netty的，连接实例可以在多个线程间共享�
 * [Spring Data Redis](https://docs.spring.io/spring-data/redis/docs/2.0.1.RELEASE/reference/html/)
 * [redis 中文文档](http://www.redis.cn/commands.html)
 
-## Dubbo
+## 多环境配置
 
 ## 全局异常
 
 * 使用 `@ControllerAdvice` 和 `@ExceptionHandler` 处理全局异常，使用@ControllerAdvice注解 可以通过 assignableTypes 指定特定的类，让异常处理类只处理特定类抛出的异常。
 * 使用`@ExceptionHandler` 处理 `Controller` 级别的异常。
 * 使用 `ResponseStatusException` 更加方便, 可以避免我们额外的异常类。
+
+## Dubbo
 
 ### 参考
 

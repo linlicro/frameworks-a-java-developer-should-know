@@ -56,4 +56,12 @@ public class ExceptionTest {
                 .andDo(print());
                 //.andExpect(jsonPath("$.message").value("the resource Not Found!"));
     }
+
+    @Test
+    public void should_retuen_500_if_server_error() throws Exception {
+        mockMvc.perform(get("/api/jsonException"))
+                .andExpect(status().is(500))
+                .andExpect(jsonPath("$.code").value("500"))
+                .andDo(print());
+    }
 }
