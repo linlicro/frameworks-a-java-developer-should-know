@@ -28,40 +28,26 @@ public class ExceptionTest {
     MockMvc mockMvc;
 
     @Test
-    public void should_return_400_if_param_not_valid() throws Exception {
-        mockMvc.perform(get("/api/illegalArgumentException"))
-                .andExpect(status().is(400))
-                .andExpect(jsonPath("$.message").value("参数错误!"));
-    }
-
-    @Test
     public void should_return_404_if_resource_not_found() throws Exception {
-        mockMvc.perform(get("/api/resourceNotFoundException"))
+        mockMvc.perform(get("/api/resourceNotFound"))
                 .andExpect(status().is(404))
-                .andExpect(jsonPath("$.message").value("the resource Not Found!"));
-    }
-
-    @Test
-    public void should_return_404_if_resource_not_found2() throws Exception {
-        mockMvc.perform(get("/api/resourceNotFoundException2"))
-                .andExpect(status().is(404))
+                .andExpect(jsonPath("$.message").value("未找到资源"))
                 .andDo(print());
-                //.andExpect(jsonPath("$.message").value("the resource Not Found!"));
     }
 
     @Test
-    public void should_return_404_if_resource_not_found3() throws Exception {
-        mockMvc.perform(get("/api/resourceNotFoundException3"))
-                .andExpect(status().is(404))
+    public void should_return_400_if_illegal_argument() throws Exception {
+        mockMvc.perform(get("/api/illegalArgument"))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$.message").value("请求数据格式验证失败"))
                 .andDo(print());
-                //.andExpect(jsonPath("$.message").value("the resource Not Found!"));
     }
 
     @Test
-    public void should_retuen_500_if_server_error() throws Exception {
-        mockMvc.perform(get("/api/jsonException"))
+    public void should_return_500_if_unknown_error() throws Exception {
+        mockMvc.perform(get("/api/unknownError"))
                 .andExpect(status().is(500))
-                .andExpect(jsonPath("$.code").value("500"))
+                .andExpect(jsonPath("$.message").value("服务异常"))
                 .andDo(print());
     }
 }

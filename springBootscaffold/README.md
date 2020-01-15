@@ -31,7 +31,7 @@ spring boot scaffold(脚手架) 集成redis、pagehelper、mybatis、log4j2、dr
           </exclusion>
       </exclusions>
   </dependency>
-  
+
   <!--使用log4j2，做日志文件框架-->
   <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -54,7 +54,7 @@ Lettuce的连接是基于Netty的，连接实例可以在多个线程间共享�
 
 所以 Lettuce 可以帮助我们充分利用异步的优势。
 
-### 参考
+### Redis 参考
 
 * [Caching Data with Spring](https://spring.io/guides/gs/caching/)
 * [Spring Data Redis](https://docs.spring.io/spring-data/redis/docs/2.0.1.RELEASE/reference/html/)
@@ -68,8 +68,24 @@ Lettuce的连接是基于Netty的，连接实例可以在多个线程间共享�
 * 使用`@ExceptionHandler` 处理 `Controller` 级别的异常。
 * 使用 `ResponseStatusException` 更加方便, 可以避免我们额外的异常类。
 
+上述的代码实现参考 `ExceptionController` 及 `ResponseStatusExceptionController`。
+
+但，实际项目中的异常处理解决方案，还需稍加优雅些。
+
+首先，返回的信息应包含异常的下面5部分内容:
+
+* 唯一标示异常的 code
+* HTTP状态码
+* 错误路径
+* 发生错误的时间戳
+* 错误的具体信息
+
+以便于前端根据异常做出对应的表现。
+
+
+
 ## Dubbo
 
-### 参考
+todo
 
 * [actuator文档](https://docs.spring.io/spring-boot/docs/2.0.5.RELEASE/reference/htmlsingle/#production-ready)

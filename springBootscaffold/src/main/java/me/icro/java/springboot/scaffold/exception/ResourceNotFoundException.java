@@ -1,7 +1,6 @@
 package me.icro.java.springboot.scaffold.exception;
 
-import lombok.Getter;
-import lombok.Setter;
+import me.icro.java.springboot.scaffold.exception.constant.Status;
 
 /**
  * 描述: 自定义异常类，未找到相关资源
@@ -9,20 +8,11 @@ import lombok.Setter;
  * @author Lin
  * @since 2020-01-15 10:49 AM
  */
-public class ResourceNotFoundException extends RuntimeException {
+public class ResourceNotFoundException extends BaseException {
 
     private static final long serialVersionUID = -5614662802284313031L;
 
-    @Getter
-    @Setter
-    private String message;
-
-    public ResourceNotFoundException() {
-        super();
-    }
-
-    public ResourceNotFoundException(String message) {
-        super(message);
-        this.message = message;
+    public ResourceNotFoundException(Object data) {
+        super(Status.RESOURCE_NOT_FOUND, data);
     }
 }

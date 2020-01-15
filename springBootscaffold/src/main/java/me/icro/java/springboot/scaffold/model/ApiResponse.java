@@ -1,8 +1,9 @@
 package me.icro.java.springboot.scaffold.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import me.icro.java.springboot.scaffold.exception.BaseException;
+import lombok.NoArgsConstructor;
 import me.icro.java.springboot.scaffold.exception.constant.Status;
 
 /**
@@ -13,6 +14,8 @@ import me.icro.java.springboot.scaffold.exception.constant.Status;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ApiResponse {
 
     /**
@@ -27,15 +30,6 @@ public class ApiResponse {
      * 返回数据
      */
     private Object data;
-
-    public ApiResponse() {
-    }
-
-    public ApiResponse(Integer code, String message, Object data) {
-        this.code = code;
-        this.message = message;
-        this.data = data;
-    }
 
     public static ApiResponse of(Integer code, String message, Object data) {
         return new ApiResponse(code, message, data);
@@ -55,13 +49,5 @@ public class ApiResponse {
 
     public static ApiResponse ofStatus(Status status, Object data) {
         return of(status.getCode(), null, data);
-    }
-
-    public static <T extends BaseException> ApiResponse ofException(T t, Object data) {
-        return of(t.getCode(), t.getMessage(), data);
-    }
-
-    public static <T extends BaseException> ApiResponse ofException(T t) {
-        return ofException(t, null);
     }
 }
