@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="me.icro.java.springboot.scaffold.mapper.AccountMapper">
+<mapper namespace="me.icro.java.springboot.scaffold.dao.db1.mapper.Account1Mapper">
     <insert id="saveUser">
         INSERT INTO `sc_account`(`id`,`name`,`password`,`salt`,`email`,`phone_number`)
         VALUES (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{salt,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{phone_number,jdbcType=VARCHAR})

@@ -11,7 +11,7 @@ spring boot scaffold(脚手架) 集成redis、pagehelper、mybatis、log4j2、dr
 
 -[x] redis
 -[x] log4j2
--[ ] properties
+-[x] properties
 -[ ] aopLog(通过AOP记录web请求日志)
 -[ ] mybatis & 通用Mapper & PageHelper(通用的Mybatis分页插件) & mybatis-plus(快速操作Mybatis)
 -[ ] druid
@@ -88,6 +88,15 @@ spring boot scaffold(脚手架) 集成redis、pagehelper、mybatis、log4j2、dr
 
 还是基于 SpringBoot+Mybatis。
 
+### 问题: Idea inspects batis mapper bean wrong
+
+一种解决方案是 在 `Mapper` 类上加上:
+
+```java
+@Mapper
+@Component
+```
+
 ## 缓存 redis
 
 整合 redis，操作redis中的数据，并使用redis缓存数据。连接池使用 Lettuce。
@@ -130,6 +139,4 @@ Lettuce的连接是基于Netty的，连接实例可以在多个线程间共享�
 
 ## Dubbo
 
-todo
-
-* [actuator文档](https://docs.spring.io/spring-boot/docs/2.0.5.RELEASE/reference/htmlsingle/#production-ready)
+dubbo 官网：<http://dubbo.apache.org/zh-cn/>

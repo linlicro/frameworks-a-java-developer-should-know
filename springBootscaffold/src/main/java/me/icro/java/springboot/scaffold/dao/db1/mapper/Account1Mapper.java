@@ -1,6 +1,6 @@
-package me.icro.java.springboot.scaffold.mapper;
+package me.icro.java.springboot.scaffold.dao.db1.mapper;
 
-import me.icro.java.springboot.scaffold.entity.Account;
+import me.icro.java.springboot.scaffold.dao.db1.domain.Account;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -12,12 +12,11 @@ import java.util.List;
  * 描述:
  *
  * @author Lin
- * @since 2020-01-10 3:08 PM
+ * @since 2020-01-16 5:11 PM
  */
 @Mapper
 @Component
-public interface AccountMapper {
-
+public interface Account1Mapper {
     /**
      * 查询所有的账号
      *

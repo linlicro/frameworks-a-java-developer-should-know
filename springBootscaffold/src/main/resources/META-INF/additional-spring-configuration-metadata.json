@@ -24,6 +24,48 @@
       "name": "developer.wechat",
       "description": "The Developer QQ Number.",
       "type": "java.lang.String"
+    },
+
+    {
+      "name": "spring.datasource.hikari.db1.jdbc-url",
+      "description": "The jdbc-url for 1st db.",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "spring.datasource.hikari.db1.username",
+      "description": "The username for 1st db.",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "spring.datasource.hikari.db1.password",
+      "description": "The password for 1st db.",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "spring.datasource.hikari.db1.driver-class-name",
+      "description": "The driver-class-name for 1st db.",
+      "type": "java.lang.String"
+    },
+
+    {
+      "name": "spring.datasource.hikari.db2.jdbc-url",
+      "description": "The jdbc-url for 2st db.",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "spring.datasource.hikari.db2.username",
+      "description": "The username for 2st db.",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "spring.datasource.hikari.db2.password",
+      "description": "The password for 2st db.",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "spring.datasource.hikari.db2.driver-class-name",
+      "description": "The driver-class-name for 2st db.",
+      "type": "java.lang.String"
     }
   ]
 }

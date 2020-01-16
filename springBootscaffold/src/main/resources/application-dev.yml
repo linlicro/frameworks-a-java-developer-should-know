@@ -19,6 +19,17 @@ spring:
     password: # 密码，如果没有的话，不用输入
   # mysql的配置
   datasource:
+    hikari:
+      db1:
+        jdbc-url: jdbc:mysql://127.0.0.1:3306/test?serverTimezone=Asia/Shanghai&characterEncoding=utf-8
+        username: root
+        password: dashu0701
+        driver-class-name: com.mysql.cj.jdbc.Driver
+      db2:
+        jdbc-url: jdbc:mysql://127.0.0.1:3306/test2?serverTimezone=Asia/Shanghai&characterEncoding=utf-8
+        username: root
+        password: dashu0701
+        driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/test?serverTimezone=Asia/Shanghai&characterEncoding=utf-8
     username: root
     password: dashu0701

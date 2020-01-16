@@ -1,10 +1,8 @@
 package me.icro.java.springboot.scaffold.service.impl;
 
-import me.icro.java.springboot.scaffold.mapper.AccountMapper;
 import me.icro.java.springboot.scaffold.service.ILoginService;
 import me.icro.java.springboot.scaffold.vo.MessageVO;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -14,9 +12,6 @@ import javax.servlet.http.HttpServletRequest;
  * @since 2020-01-14 3:42 PM
  */
 public class LoginServiceImpl implements ILoginService {
-
-    @Resource
-    private AccountMapper accountMapper;
 
     @Override
     public MessageVO userLogin(HttpServletRequest request, String username, String password) {

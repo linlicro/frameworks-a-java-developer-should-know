@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="me.icro.java.springboot.scaffold.dao.db2.mapper.MoneyMapper">
+    <insert id="saveMoney">
+        INSERT INTO `sc_money`(`id`,`acount_id`,`basic`,`reward`,`punishment`)
+        VALUES (#{id,jdbcType=BIGINT}, #{acount_id,jdbcType=BIGINT}, #{basic,jdbcType=BIGINT}, #{reward,jdbcType=BIGINT}, #{punishment,jdbcType=BIGINT}})
+    </insert>
+
+</mapper>
