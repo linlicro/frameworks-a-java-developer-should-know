@@ -220,6 +220,26 @@ brew services start <formula>
 brew services list
 ```
 
+### 使用Homebrew中遇到的问题记录
+
+Q1: cannot load such file -- active_support/core_ext/object/blank (LoadError):
+
+```sh
+brew doctor
+Traceback (most recent call last):
+ 4: from /usr/local/Homebrew/Library/Homebrew/brew.rb:23:in `<main>'
+ 3: from /usr/local/Homebrew/Library/Homebrew/brew.rb:23:in `require_relative'
+ 2: from /usr/local/Homebrew/Library/Homebrew/global.rb:13:in `<top (required)>'
+ 1: from /System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/ruby/2.6.0/rubygems/core_ext/kernel_require.rb:54:in `require'
+/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/ruby/2.6.0/rubygems/core_ext/kernel_require.rb:54:in `require': cannot load such file -- active_support/core_ext/object/blank (LoadError)
+```
+
+解决方案:
+
+```sh
+brew update-reset
+```
+
 ## iTerm2
 
 更优雅地 command-line 工作姿势，请使用 [iTerm2](http://www.iterm2.com/)。
@@ -527,6 +547,17 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.74-b02, mixed mode)
 
 ### Homebrew(推荐)
 
+#### 注意: 更新
+
+Java8 is no longer available on Homebrew. Use below command instead :
+
+```sh
+brew cask install adoptopenjdk/openjdk/adoptopenjdk8
+```
+
+* [Java8 not working anymore](https://github.com/Homebrew/homebrew-cask-versions/issues/7253)
+* [adoptopenjdk](https://adoptopenjdk.net/)
+
 ```sh
 brew update
 brew tap caskroom/versions
@@ -558,7 +589,7 @@ export JAVA_HOME="`/usr/libexec/java_home -v 1.8`"
 export JAVA_HOME="`/usr/libexec/java_home -v 9`"
 ```
 
-Java开发IDE推荐[IntelliJ](https://www.jetbrains.com/idea/download/)
+Java开发IDE推荐[IntelliJ](https://www.jetbrains.com/idea/download/)，另附 [IntelliJ-IDEA-Tutorial](https://github.com/judasn/IntelliJ-IDEA-Tutorial)。
 
 ## Visual Studio Code
 
