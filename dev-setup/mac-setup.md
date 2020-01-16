@@ -148,18 +148,40 @@ graphviz | brew install graphviz | 拓扑图绘制工具
 
 ### 扩展1 - brew cask
 
-使用 brew cask 安装 macOS 应用程序、字体和插件以及其他非开源软件。不会再出现了“要安装，请拖动此图标......”。
+通过 Homebrew Cask 优雅、简单、快速的安装和管理 OS X 图形界面程序。不会再出现了“要安装，请拖动此图标......”。
 
 安装:
 
 ```sh
+#安装Homebrew Cask（可选 正常安装的Homebrew不需要）
 brew tap caskroom/cask
-```
+brew install brew-cask
 
-搜索:
+#使用Homebrew Cask安装软件
+brew cask install <appName>
+#多包一起安装
+brew cask install <appName1> <appName2> <appName3>
 
-```sh
-brew search <package>
+#更新 Homebrew Cask
+brew cask update
+
+#使用Homebrew Cask卸载软件
+brew cask uninstall <appName>
+
+#使用Homebrew Cask搜索软件
+#列出所有可以被安装的软件
+brew cask search
+#查找所有与keyword关键词有关的软件
+brew cask search keyword
+
+#查看软件信息
+brew cask info <appName>
+
+#删除 Homebrew Cask 下载的包
+brew cask cleanup
+
+#列出通过 Homebrew Cask 安装的包
+brew cask list
 ```
 
 brew cask 安装常用工具:
@@ -785,6 +807,40 @@ Package Control 可方便管理Sublime text的插件，最方便的安装方式�
 * [Git](https://github.com/kemayo/sublime-text-git): Plugin for some Git integration
 * [SublimeLinter](https://sublimelinter.readthedocs.io/en/stable/): Interactive code linting framework for Sublime Text 3
 * [IndentXML](https://github.com/alek-sys/sublimetext_indentxml): Plugin for re-indenting XML and JSON files
+
+## Docker
+
+[Docker](https://docs.docker.com/)是开发人员和系统管理员开发、发布和运行应用程序的平台。如果你也使用`Oh My Zsh`，推荐使用[Docker插件](https://github.com/ohmyzsh/ohmyzsh/wiki/Plugins#docker)。
+
+### Docker 安装
+
+官网: <https://docs.docker.com/docker-for-mac/install/>下载安装包。或者使用`Homebrew-Cask`方式 `brew cask install docker`。
+
+启动你的第一个容器: `docker run hello-world`。
+
+新人请阅读[快速入门教程](https://docs.docker.com/get-started/)。
+
+Docker的命令参考[docker-cheat-sheet](https://github.com/wsargent/docker-cheat-sheet)。
+
+#### 一些小技巧
+
+```sh
+# remove ALL your containers
+docker container prune
+
+# Delete all untagged containers
+docker image prune
+
+# See all space Docker take up
+docker system df
+
+# Get IP address of running container
+docker inspect [CONTAINER ID] | grep -wm1 IPAddress | cut -d '"' -f 4
+
+# Kill all running containers
+docker kill $(docker ps -q)
+
+```
 
 ## 参考
 
