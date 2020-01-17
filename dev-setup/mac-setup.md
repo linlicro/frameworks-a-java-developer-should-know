@@ -580,6 +580,8 @@ brew cask install adoptopenjdk/openjdk/adoptopenjdk8
 * [Java8 not working anymore](https://github.com/Homebrew/homebrew-cask-versions/issues/7253)
 * [adoptopenjdk](https://adoptopenjdk.net/)
 
+===========================================================
+
 ```sh
 brew update
 brew tap caskroom/versions
@@ -612,6 +614,29 @@ export JAVA_HOME="`/usr/libexec/java_home -v 9`"
 ```
 
 Java开发IDE推荐[IntelliJ](https://www.jetbrains.com/idea/download/)，另附 [IntelliJ-IDEA-Tutorial](https://github.com/judasn/IntelliJ-IDEA-Tutorial)。
+
+## MySQL
+
+一般通过`Homebrew`来安装[MySQL](http://www.mysql.com/)。*注: 我们常用5.7版本，可以通过命令`brew install mysql@5.7`来安装*
+
+```sh
+# 安装
+brew install mysql
+
+# 启动(开机自启动)
+brew services start mysql
+
+# 修改密码(默认无密码，不影响本地的开发)
+mysqladmin -u root password 'new-password'
+```
+
+### GUI Tool
+
+[Sequel Pro](http://www.sequelpro.com/):
+
+```sh
+brew cask install sequel-pro
+```
 
 ## Visual Studio Code
 
