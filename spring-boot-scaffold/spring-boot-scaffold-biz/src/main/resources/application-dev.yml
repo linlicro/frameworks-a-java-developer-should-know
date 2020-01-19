@@ -37,6 +37,11 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     initialization-mode: always
     continue-on-error: true
+  # dubbo配置
+  dubbo:
+    application:
+      name: spring-boot-scaffold-dubbo-provider
+      registry: zookeeper://localhost:2181
 server:
   port: 8080
   servlet:

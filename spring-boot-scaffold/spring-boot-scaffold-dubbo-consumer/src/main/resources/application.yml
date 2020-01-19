@@ -1,0 +1,10 @@
+server:
+  port: 9090
+  servlet:
+    context-path: /consumer
+
+spring:
+  dubbo:
+    application:
+      name: spring-boot-scaffold-dubbo-consumer
+      registry: zookeeper://127.0.0.1:2181
