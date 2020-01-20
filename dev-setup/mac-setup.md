@@ -262,6 +262,29 @@ Traceback (most recent call last):
 brew update-reset
 ```
 
+Q2:error: The last gc run reported the following. Please correct the root cause and remove .git/gc.log. Automatic cleanup will not be performed until the file is removed.
+
+warning: There are too many unreachable loose objects; run 'git prune' to remove them.
+
+```sh
+# fix
+cd "$(brew --repo)" # Navigate to Homebrew's git repository
+git prune && git gc # Remove loose objects
+rm -rf /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/.git/gc.log
+
+# check
+cd - # Go back to the original location
+brew update
+```
+
+参考: <https://stackoverflow.com/questions/34859640/error-when-trying-to-brew-update/34869798>
+
+Q3: Error: Another active Homebrew update process is already in progress.
+
+```sh
+rm -rf /usr/local/var/homebrew/locks # 删除临时文件
+```
+
 ## iTerm2
 
 更优雅地 command-line 工作姿势，请使用 [iTerm2](http://www.iterm2.com/)。
@@ -615,6 +638,8 @@ export JAVA_HOME="`/usr/libexec/java_home -v 9`"
 
 Java开发IDE推荐[IntelliJ](https://www.jetbrains.com/idea/download/)，另附 [IntelliJ-IDEA-Tutorial](https://github.com/judasn/IntelliJ-IDEA-Tutorial)。
 
+jetbrains-agent 参考: <https://zhile.io/2018/08/25/jetbrains-license-server-crack.html>
+
 ## MySQL
 
 一般通过`Homebrew`来安装[MySQL](http://www.mysql.com/)。*注: 我们常用5.7版本，可以通过命令`brew install mysql@5.7`来安装*
@@ -865,6 +890,35 @@ docker inspect [CONTAINER ID] | grep -wm1 IPAddress | cut -d '"' -f 4
 # Kill all running containers
 docker kill $(docker ps -q)
 
+```
+
+## Elasticsearch
+
+[Elasticsearch](https://www.elastic.co/products/elasticsearch)是一个分布式搜索和分析引擎。
+
+```sh
+# 安装
+brew install elasticsearch
+
+# 运行
+brew services start elasticsearch
+
+# test
+curl -XGET 'http://localhost:9200/'
+```
+
+文档: <https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html> [Elasticsearch: The Definitive Guide](https://www.elastic.co/guide/en/elasticsearch/guide/master/index.html)
+
+GUI: [dejavu](https://github.com/appbaseio/dejavu)
+
+## 其他
+
+### 下载工具 Motrix
+
+[motrix](https://motrix.app/)是一款全能的下载工具，支持下载 HTTP、FTP、BT、磁力链、百度网盘等资源。
+
+```sh
+brew update && brew cask install motrix
 ```
 
 ## 参考
