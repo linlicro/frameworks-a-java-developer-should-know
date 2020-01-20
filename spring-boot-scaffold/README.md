@@ -4,10 +4,10 @@ spring boot scaffold(脚手架) 集成redis、pagehelper、mybatis、log4j2、dr
 
 ## 开发环境
 
-* 开发工具: IDEA
-* 基础工具: Maven、JDK8
-* 开发技术: Springboot(2.1.4.RELEASE)、Mybatis等
-* 其他技术: Redis、MySQL
+* IDEA(注意：务必使用 IDEA 开发，同时保证安装 lombok 插件)
+* Maven、JDK 1.8+
+* Springboot(2.1.4.RELEASE)、Mybatis等
+* Redis、Mysql 5.7 + (尽量保证使用 5.7 版本以上，因为 5.7 版本加了一些新特性，同时不向下兼容。本 demo 里会尽量避免这种不兼容的地方，但还是建议尽量保证 5.7 版本以上)
 
 -[x] redis
 -[x] log4j2
@@ -16,7 +16,7 @@ spring boot scaffold(脚手架) 集成redis、pagehelper、mybatis、log4j2、dr
 -[x] mybatis & 通用Mapper & 多数据源
 -[ ] PageHelper(通用的Mybatis分页插件) & mybatis-plus(快速操作Mybatis)
 -[ ] druid
--[ ] Dubbo(采用官方的starter)
+-[x] Dubbo(采用官方的starter)
 -[ ] jwt
 -[ ] mail
 -[ ] actuator(监控)
@@ -26,6 +26,8 @@ spring boot scaffold(脚手架) 集成redis、pagehelper、mybatis、log4j2、dr
 ## 日志 log4j2
 
 使用log4j2，做日志文件框架，移除了springBoot自带的logback。
+
+Log4j2是Log4j的升级版本，Log4j2相对于Log4j1.x 有了很多显著的改善。
 
 ```xml
 <dependencies>
@@ -46,8 +48,17 @@ spring boot scaffold(脚手架) 集成redis、pagehelper、mybatis、log4j2、dr
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-log4j2</artifactId>
   </dependency>
+
+    <!-- 日志文件异步依赖 -->
+    <dependency>
+        <groupId>com.lmax</groupId>
+        <artifactId>disruptor</artifactId>
+        <version>3.4.1</version>
+    </dependency>
 </dependencies>
 ```
+
+常见错误(Multiple bindings were found on the class path)的解决方案: 通过IDEA查找包之间的依赖，以及按需求排除依赖。 参考 <http://www.slf4j.org/codes.html#multiple_bindings>
 
 小技巧，使用 `@Slf4j` 来替代初始化 `org.slf4j.Logger`，更方便哦。
 
@@ -138,4 +149,39 @@ Lettuce的连接是基于Netty的，连接实例可以在多个线程间共享�
 
 ## Dubbo
 
+Apache Dubbo (incubating) |ˈdʌbəʊ| 是一款高性能、轻量级的开源Java RPC 框架，它提供了三大核心能力：面向接口的远程方法调用，智能容错和负载均衡，以及服务自动注册和发现。
+
+简单来说 Dubbo 是一个分布式服务框架，致力于提供高性能和透明化的RPC远程服务调用方案，以及SOA服务治理方案。
+
 dubbo 官网：<http://dubbo.apache.org/zh-cn/>
+
+这里使用ZooKeeper作为服务注册中心，引入[dubbo-spring-boot-project](https://github.com/apache/dubbo-spring-boot-project)来实现服务编码。
+
+pom:
+
+```xml
+<!-- dubbo依赖 -->
+<dependency>
+    <groupId>com.alibaba.spring.boot</groupId>
+    <artifactId>dubbo-spring-boot-starter</artifactId>
+    <version>${dubbo.starter.version}</version>
+</dependency>
+<dependency>
+    <groupId>com.101tec</groupId>
+    <artifactId>zkclient</artifactId>
+    <version>${zkclient.version}</version>
+</dependency>
+```
+
+application.yml:
+
+```text
+spring:
+   # dubbo配置
+  dubbo:
+    application:
+      name: spring-boot-scaffold-dubbo-provider
+      registry: zookeeper://localhost:2181
+```
+
+具体实现见dubbo服务提供`HelloServiceImpl` 和 消费者`HelloController`。

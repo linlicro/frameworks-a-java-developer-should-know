@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * @author Lin
  * @since 2020-01-19 2:14 PM
  */
-@Service
+@Service(filter = "executionArgumentAndTimeCollectFilter")
 @Component
 @Slf4j
 public class HelloServiceImpl implements HelloService {

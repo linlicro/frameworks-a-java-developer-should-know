@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 public class HelloController {
-    @Reference
+    @Reference(check = false)
     private HelloService helloService;
 
     @GetMapping("/sayHello")
