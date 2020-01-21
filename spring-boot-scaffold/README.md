@@ -13,7 +13,7 @@ spring boot scaffold(脚手架) 集成redis、pagehelper、mybatis、log4j2、dr
 -[x] log4j2
 -[x] properties
 -[ ] aopLog(通过AOP记录web请求日志)
--[x] mybatis & 通用Mapper & 多数据源
+-[x] mybatis & 通用Mapper & 多数据源 && pagehelper
 -[ ] PageHelper(通用的Mybatis分页插件) & mybatis-plus(快速操作Mybatis)
 -[ ] druid
 -[x] Dubbo(采用官方的starter)
@@ -22,6 +22,14 @@ spring boot scaffold(脚手架) 集成redis、pagehelper、mybatis、log4j2、dr
 -[ ] actuator(监控)
 -[ ] admin(可视化的监控)
 -[ ] Spring Boot CLI: CLI自动生成
+
+## 一个小彩蛋：动态 Banner
+
+来尝尝鲜。
+
+很简单，只需要在src/main/resources路径下新建一个banner.txt文件，banner.txt中填写好需要打印的字符串内容即可。
+
+借助第三方工具帮忙转化内容，如网站 <http://www.network-science.de/ascii/> 将文字转化成字符串，网站： <http://www.degraeve.com/img2txt.php> 可以将图片转化成字符串。
 
 ## 日志 log4j2
 
@@ -109,6 +117,11 @@ Log4j2是Log4j的升级版本，Log4j2相对于Log4j1.x 有了很多显著的改
 @Component
 ```
 
+### 通用Mapper 和 pagehelper
+
+通用Mapper官方文档：<https://github.com/abel533/Mapper/wiki/1.integration>
+pagehelper 官方文档：<https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md>
+
 ## 缓存 redis
 
 整合 redis，操作redis中的数据，并使用redis缓存数据。连接池使用 Lettuce。
@@ -185,3 +198,7 @@ spring:
 ```
 
 具体实现见dubbo服务提供`HelloServiceImpl` 和 消费者`HelloController`。
+
+### Filter
+
+使用`Filter`对dubbo请求进行日志记录。详细见 `ExecutionArgumentAndTimeCollectFilter`。
