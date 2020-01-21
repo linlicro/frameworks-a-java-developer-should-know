@@ -22,7 +22,7 @@ public class ExecutionArgumentAndTimeCollectFilter implements Filter {
         log.info("[ExecutionArgumentAndTimeCollectFilter]client {} trying to invoke service {} method {} with arguments {}", clientIp, invoker.getInterface().getName(),
                 RpcUtils.getMethodName(invocation),
                 Arrays.toString(RpcUtils.getArguments(invocation)));
-        Long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         Result result;
         try {
             result = invoker.invoke(invocation);

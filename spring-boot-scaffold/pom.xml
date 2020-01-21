@@ -7,8 +7,8 @@
 
 	<modules>
 		<module>spring-boot-scaffold-biz</module>
-		<module>spring-boot-scaffold-dubbo-common</module>
 		<module>spring-boot-scaffold-dubbo-consumer</module>
+		<module>spring-boot-scaffold-dubbo-common</module>
 	</modules>
 
 	<groupId>me.icro.java</groupId>

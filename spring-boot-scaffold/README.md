@@ -88,6 +88,10 @@ Log4j2是Log4j的升级版本，Log4j2相对于Log4j1.x 有了很多显著的改
 
 注意: 需要打包编译后生效 `mvn clean package`。
 
+## 通过AOP记录web请求日志
+
+使用 aop 切面对请求进行日志记录，并且记录 UserAgent 信息。
+
 ## 整合 mybatis
 
 最简易方式是 mybatis 官方提供的脚手架 mybatis-spring-boot-starter。
