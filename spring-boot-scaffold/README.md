@@ -88,6 +88,72 @@ Log4j2是Log4j的升级版本，Log4j2相对于Log4j1.x 有了很多显著的改
 
 注意: 需要打包编译后生效 `mvn clean package`。
 
+## actuator
+
+Actuator 是 Spring Boot 提供的对应用系统的自省和监控的集成功能，可以查看应用配置的详细信息，例如自动化配置信息、创建的 Spring beans 以及一些环境属性等。
+
+Actuator 监控分成两类：原生端点和用户自定义端点；自定义端点主要是指扩展性，用户可以根据自己的实际应用，定义一些比较关心的指标，在运行期进行监控。
+
+原生端点是在应用程序里提供众多 Web 接口，通过它们了解应用程序运行时的内部状况。原生端点又可以分成三类：
+
+* 应用配置类：可以查看应用在运行期的静态信息：例如自动配置信息、加载的 springbean 信息、yml 文件配置信息、环境信息、请求映射信息；
+* 度量指标类：主要是运行期的动态信息，例如堆栈、请求连、一些健康指标、metrics 信息等；
+* 操作控制类：主要是指 shutdown,用户可以发送一个请求将应用的监控功能关闭。
+
+Actuator 提供了 以下接口:
+
+1. /auditevents: 显示应用暴露的审计事件 (比如认证进入、订单失败)
+2. /beans: 描述应用程序上下文里全部的 Bean，以及它们的关系
+3. /conditions: 提供一份自动配置生效的条件情况，记录哪些自动配置条件通过了，哪些没通过
+4. /configprops: 描述配置属性(包含默认值)如何注入Bean
+5. /env or /env/{name}: 获取全部环境属性
+6. /flyway: 提供一份 Flyway 数据库迁移信息
+7. /health: 报告应用程序的健康指标，这些值由 HealthIndicator 的实现类提供
+8. /heapdump: dump 一份应用的 JVM 堆信息
+9. /httptrace: 显示HTTP足迹，最近100个HTTP request/repsponse
+10. /info: 获取应用程序的定制信息，这些信息由info打头的属性提供
+11. /loggers: 显示和修改配置的loggers
+12. /metrics or /metrics/{name}: 报告各种应用程序度量信息，比如内存用量和HTTP请求计数
+13. /scheduledtasks: 展示应用中的定时任务信息
+14. /sessions: 如果我们使用了 Spring Session 展示应用中的 HTTP sessions 信息
+15. /shutdown: 关闭应用程序，要求endpoints.shutdown.enabled设置为true
+16. /mappings: 展示全部的@RequestMapping URI路径，以及它们和控制器
+17. /threaddump: 获取线程活动的快照
+
+### 参考
+
+[Spring Boot Actuator: Production-ready Features](https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html)
+
+问题记录:
+
+```txt
+错误: Exception in thread "main" while scanning for the next token found character '@' that cannot start any token. (Do not use @ for indentation)
+
+A: 由于springboot对于占位符@无法识别，当是普通字符的话，可以使用单引号或者双引号来包起来。这里的解决方案是:如果使用spring-boot-starter-parent，你可以通过@..@占位符引用Maven项目的属性; 但咱们不使用starter parent，可以在pom.xml添加:
+
+<resources>
+    <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+    </resource>
+</resources>
+
+以及
+
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-resources-plugin</artifactId>
+    <version>2.7</version>
+    <configuration>
+        <delimiters>
+            <delimiter>@</delimiter>
+        </delimiters>
+        <useDefaultDelimiters>false</useDefaultDelimiters>
+    </configuration>
+</plugin>
+
+```
+
 ## 通过AOP记录web请求日志
 
 使用 aop 切面对请求进行日志记录，并且记录 UserAgent 信息。
