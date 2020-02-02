@@ -115,6 +115,8 @@
         <!-- 日志记录Logger -->
         <logger name="org.springframework" level="WARN">
         </logger>
+        <logger name="org.apache.zookeeper" level="WARN">
+        </logger>
         <logger name="org.mybatis" level="INFO">
         </logger>
         <!--

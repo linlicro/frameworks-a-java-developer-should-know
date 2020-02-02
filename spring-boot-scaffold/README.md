@@ -12,14 +12,14 @@ spring boot scaffold(脚手架) 集成redis、pagehelper、mybatis、log4j2、dr
 -[x] redis
 -[x] log4j2
 -[x] properties
--[ ] aopLog(通过AOP记录web请求日志)
+-[x] aopLog(通过AOP记录web请求日志)
 -[x] mybatis & 通用Mapper & 多数据源 && pagehelper
 -[ ] PageHelper(通用的Mybatis分页插件) & mybatis-plus(快速操作Mybatis)
 -[ ] druid
 -[x] Dubbo(采用官方的starter)
 -[ ] jwt
 -[ ] mail
--[ ] actuator(监控)
+-[x] actuator(监控)
 -[ ] admin(可视化的监控)
 -[ ] Spring Boot CLI: CLI自动生成
 
@@ -88,7 +88,7 @@ Log4j2是Log4j的升级版本，Log4j2相对于Log4j1.x 有了很多显著的改
 
 注意: 需要打包编译后生效 `mvn clean package`。
 
-## actuator
+## Actuator
 
 Actuator 是 Spring Boot 提供的对应用系统的自省和监控的集成功能，可以查看应用配置的详细信息，例如自动化配置信息、创建的 Spring beans 以及一些环境属性等。
 
@@ -120,7 +120,35 @@ Actuator 提供了 以下接口:
 16. /mappings: 展示全部的@RequestMapping URI路径，以及它们和控制器
 17. /threaddump: 获取线程活动的快照
 
-### 参考
+依赖:
+
+```xml
+<!--actuator依赖-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+```
+
+配置:
+
+```yml
+management:
+  endpoints:
+    web:
+      base-path: /monitor
+      exposure:
+        include: '*'
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      show-details: always
+  server:
+    port: 7890
+```
+
+### Actuator 参考
 
 [Spring Boot Actuator: Production-ready Features](https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html)
 
@@ -153,6 +181,90 @@ A: 由于springboot对于占位符@无法识别，当是普通字符的话，可
 </plugin>
 
 ```
+
+## Spring Boot Admin
+
+Actuator 提供了对单个 Spring Boot 的监控，信息包含：应用状态、内存、线程、堆栈等等，比较全面的监控了 Spring Boot 应用的整个生命周期。
+
+但是这样监控也有一些问题：第一，所有的监控都需要调用固定的接口来查看，如果全面查看应用状态需要调用很多接口，并且接口返回的 Json 信息不方便运营人员理解；第二，如果 Spring Boot 应用集群非常大，每个应用都需要调用不同的接口来查看监控信息，操作非常繁琐低效。在这样的背景下，就诞生了另外一个开源软件：Spring Boot Admin。
+
+Spring Boot Admin 是一个管理和监控 Spring Boot 应用程序的开源软件。每个应用都认为是一个客户端，通过 HTTP 或者使用 Eureka 注册到 admin server 中进行展示，Spring Boot Admin UI 部分使用 VueJs 将数据展示在前端。
+
+### Admin Server端
+
+依赖:
+
+```xml
+<!--admin依赖-->
+<dependency>
+    <groupId>de.codecentric</groupId>
+    <artifactId>spring-boot-admin-starter-server</artifactId>
+</dependency>
+```
+
+启动类添加: `@EnableAdminServer`
+
+```java
+@SpringBootApplication
+@EnableDubboConfiguration
+@EnableAdminServer
+public class ScaffoldApplication {
+```
+
+### Admin Client端
+
+依赖:
+
+```xml
+<dependency>
+    <groupId>de.codecentric</groupId>
+    <artifactId>spring-boot-admin-starter-client</artifactId>
+</dependency>
+```
+
+添加配置信息:
+
+```yml
+spring:
+  boot:
+    admin:
+      client:
+        # Spring Boot Admin 服务端地址
+        url: "http://127.0.0.1:8000"
+#        instance:
+#          metadata:
+#            # 客户端端点信息的安全认证信息
+#            user.name: ${spring.security.user.name}
+#            user.password: ${spring.security.user.password}
+#  security:
+#    user:
+#      name: icro
+#      password: 123456
+
+management:
+  endpoints:
+    web:
+      #      base-path: /monitor
+      exposure:
+        # 设置端点暴露的哪些内容，默认["health","info"]，设置"*"代表暴露所有可访问的端点
+        include: '*'
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      # 端点健康情况，默认值"never"，设置为"always"可以显示硬盘使用情况和线程情况
+      show-details: always
+  server:
+    port: 7890
+```
+
+启动应用后，可以在 Admin服务端自动检测，并展示:
+
+![admin server](img/admin-server.jpg)
+
+### 通过Eureka监控微服务
+
+todo
 
 ## 通过AOP记录web请求日志
 

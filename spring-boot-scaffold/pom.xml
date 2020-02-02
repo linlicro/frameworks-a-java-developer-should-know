@@ -9,7 +9,8 @@
 		<module>spring-boot-scaffold-biz</module>
 		<module>spring-boot-scaffold-dubbo-consumer</module>
 		<module>spring-boot-scaffold-dubbo-common</module>
-	</modules>
+        <module>spring-boot-scaffold-admin-server</module>
+    </modules>
 
 	<groupId>me.icro.java</groupId>
 	<artifactId>spring-boot-scaffold</artifactId>
@@ -41,6 +42,16 @@
 				<version>${spring.boot.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>de.codecentric</groupId>
+				<artifactId>spring-boot-admin-starter-server</artifactId>
+				<version>2.1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>de.codecentric</groupId>
+				<artifactId>spring-boot-admin-starter-client</artifactId>
+				<version>2.1.0</version>
 			</dependency>
 			<dependency>
 				<groupId>mysql</groupId>
