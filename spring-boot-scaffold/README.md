@@ -304,6 +304,32 @@ todo
 通用Mapper官方文档：<https://github.com/abel533/Mapper/wiki/1.integration>
 pagehelper 官方文档：<https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md>
 
+引入依赖:
+
+```xml
+<!-- 通用Mapper -->
+<dependency>
+    <groupId>tk.mybatis</groupId>
+    <artifactId>mapper-spring-boot-starter</artifactId>
+    <version>${mybatis.mapper.version}</version>
+</dependency>
+
+<!-- 分页助手 -->
+<dependency>
+    <groupId>com.github.pagehelper</groupId>
+    <artifactId>pagehelper-spring-boot-starter</artifactId>
+    <version>${mybatis.pagehelper.version}</version>
+</dependency>
+```
+
+启动类新增注解:
+
+```java
+@MapperScan(basePackages = {"me.icro.java.springboot.scaffold.dao.mybatis.mapper"})
+```
+
+详细见: `AccountMapper` 及相关测试用例。
+
 ## 缓存 redis
 
 整合 redis，操作redis中的数据，并使用redis缓存数据。连接池使用 Lettuce。

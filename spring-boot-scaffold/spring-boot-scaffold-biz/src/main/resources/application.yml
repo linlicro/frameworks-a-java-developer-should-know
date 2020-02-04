@@ -9,13 +9,6 @@ spring:
   # 配置测试和线上文件
   profiles:
     active: dev
-mybatis:
-  configuration:
-    map-underscore-to-camel-case: true
-    # SQL控制台打印
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  mapper-locations: classpath:mappers/*.xml
-  type-aliases-package: me.icro.java.springboot.scaffold.entity
 # 配置日志框架
 logging:
   config: classpath:log4j2-spring.xml

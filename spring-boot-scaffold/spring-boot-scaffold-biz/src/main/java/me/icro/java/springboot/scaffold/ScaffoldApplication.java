@@ -3,6 +3,7 @@ package me.icro.java.springboot.scaffold;
 import com.alibaba.dubbo.spring.boot.annotation.EnableDubboConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import tk.mybatis.spring.annotation.MapperScan;
 
 /**
  * 描述:
@@ -12,6 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 @EnableDubboConfiguration
+@MapperScan(basePackages = {"me.icro.java.springboot.scaffold.dao.mybatis.mapper"})
 public class ScaffoldApplication {
 
     public static void main(String[] args) {
