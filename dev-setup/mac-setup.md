@@ -1,5 +1,7 @@
 # macOS 设置指南
 
+主要记录我的Mac开发环境的设置，以及一些优秀软件，使用技巧等。所有的设置 、软件 以及技巧 都追求极致简洁和极致效率，最大可能提升工具效率，提升生产力。
+
 ## 系统
 
 第一件事件是**升级系统**，左上角图标 -> 关于本机 -> 软件更新...
@@ -21,11 +23,13 @@
 
 程序坞(Docker):
 
+* Dock只放置常用App
 * 大小设置到最小(拖到最左边)，以显示最小图标
-* 选中`自动显示和隐藏程序坞`
+* 选中`自动显示和隐藏程序坞`，建议移动至左侧
 
 键盘(Keyboard):
 
+* F1 - F12 设置为标准功能键
 * 设置`按键重复` 最快
 * 设置`重复前延迟` 最短
 
@@ -33,9 +37,13 @@
 
 * 系统偏好设置/辅助功能/显示, 勾选 (减弱动态效果、减少透明度)
 
+取消自动更新:
+
+* AppStore → Preference → Automaticallycheck forupdates
+
 ## Homebrew
 
-[Homebrew](https://brew.sh/) calls itself The missing package manager for macOS and is an essential tool for any developer. 小编注: macOS缺失的软件包的管理器，通过命令行安装 Mac 软件的工具(大部分是命令行工具)。
+[Homebrew](https://brew.sh/) 是一款Mac OS平台下的软件包管理工具，拥有安装、卸载、更新、查看、搜索等很多实用的功能。简单的一条指令，就可以实现包管理，而不用你关心各种依赖和文件路径的情况，十分方便快捷 小编注: macOS缺失的软件包的管理器，通过命令行安装 Mac 软件的工具(大部分是命令行工具)。
 
 ### Homebrew的安装
 
@@ -287,7 +295,7 @@ rm -rf /usr/local/var/homebrew/locks # 删除临时文件
 
 ## iTerm2
 
-更优雅地 command-line 工作姿势，请使用 [iTerm2](http://www.iterm2.com/)。
+Mac命令行终端神器，更优雅地 command-line 工作姿势，请使用 [iTerm2](http://www.iterm2.com/)。
 
 使用 `Homebrew` 安装
 
@@ -911,7 +919,7 @@ curl -XGET 'http://localhost:9200/'
 
 GUI: [dejavu](https://github.com/appbaseio/dejavu)
 
-## 其他
+## 其他 - 软件
 
 ### 下载工具 Motrix
 
@@ -920,6 +928,34 @@ GUI: [dejavu](https://github.com/appbaseio/dejavu)
 ```sh
 brew update && brew cask install motrix
 ```
+
+### Charles
+
+抓包神器 / Mock工具
+
+### Dash
+
+Mac专属的文档管理工具
+
+### Rescue Time
+
+日常行为管理。可以分析出日常使用电脑时间分配，细化到软件/网站层面，对于提升工作效率还是很有意义的。
+
+### sizeup
+
+窗口管理, 多/大显示器尤其实用
+
+### IINA
+
+多媒体播放，mpv内核,开源软件,快速迭代中,强推.
+
+### The Unarchiver
+
+解压缩神器
+
+### HandShaker
+
+情怀工匠精神锤出品，mac上管理安卓手机文件一把好手
 
 ## 参考
 
