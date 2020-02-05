@@ -30,7 +30,7 @@
 		<mybatis.starter.version>2.0.1</mybatis.starter.version>
 		<mysql.connector.version>8.0.15</mysql.connector.version>
 		<fastjson.version>1.2.47</fastjson.version>
-		<guava.version>19.0</guava.version>
+		<guava.version>20.0</guava.version>
 		<disruptor.version>3.4.1</disruptor.version>
 	</properties>
 

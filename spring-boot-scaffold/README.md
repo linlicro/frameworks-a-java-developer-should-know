@@ -20,7 +20,8 @@ spring boot scaffold(脚手架) 集成redis、pagehelper、mybatis、log4j2、dr
 -[ ] jwt
 -[ ] mail
 -[x] actuator(监控)
--[ ] admin(可视化的监控)
+-[x] admin(可视化的监控)
+-[ ] 集成原生 swagger
 -[ ] Spring Boot CLI: CLI自动生成
 
 ## 一个小彩蛋：动态 Banner
@@ -269,6 +270,80 @@ todo
 ## 通过AOP记录web请求日志
 
 使用 aop 切面对请求进行日志记录，并且记录 UserAgent 信息。
+
+## 原生swagger2
+
+swagger用于 自动生成 API 文档。
+
+参考:
+
+* swagger 官方网站：<https://swagger.io/>
+* swagger 官方文档：<https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Getting-started>
+* swagger 常用注解：<https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations>
+
+依赖:
+
+```xml
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger2</artifactId>
+    <version>${swagger.version}</version>
+</dependency>
+
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger-ui</artifactId>
+    <version>${swagger.version}</version>
+</dependency>
+```
+
+Swagger2 配置:
+
+```java
+/**
+ * 描述: Swagger2 配置
+ *
+ * @author Lin
+ * @since 2020-02-05 3:24 下午
+ */
+@Configuration
+@EnableSwagger2
+public class Swagger2Config {
+
+    @Bean
+    public Docket createRestApi() {
+        return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo())
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("me.icro.java.springboot.scaffold.controller"))
+                .paths(PathSelectors.any())
+                .build();
+    }
+
+    private ApiInfo apiInfo() {
+        return new ApiInfoBuilder().title("spring-boot-scaffold")
+                .description("这是一个简单的 spring boot脚手架 演示")
+                .contact(new Contact("Lin", "http://blog.icro.me/", "linli.cro@gmail.com"))
+                .version("1.0.0-SNAPSHOT")
+                .build();
+    }
+}
+```
+
+API层的注解 示例见 `me.icro.java.springboot.scaffold.controller.TestController`。
+
+最后效果见: <http://localhost:8080/scaffold/swagger-ui.html#/>
+
+### 遇到问题记录
+
+问题:
+
+```txt
+The following method did not exist:
+
+    com.google.common.collect.FluentIterable.concat(Ljava/lang/Iterable;Ljava/lang/Iterable;)Lcom/google/common/collect/FluentIterable;
+```
+
+解决方案: swagger2的新版本(只要版本高于2.7)，需guava版本20+才能兼容
 
 ## 整合 mybatis
 
