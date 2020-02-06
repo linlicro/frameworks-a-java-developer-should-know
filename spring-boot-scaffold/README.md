@@ -14,7 +14,7 @@ spring boot scaffold(脚手架) 集成redis、pagehelper、mybatis、log4j2、dr
 -[x] properties
 -[x] aopLog(通过AOP记录web请求日志)
 -[x] mybatis & 通用Mapper & 多数据源 && pagehelper
--[ ] PageHelper(通用的Mybatis分页插件) & mybatis-plus(快速操作Mybatis)
+-[ ] 异步编程
 -[ ] druid
 -[x] Dubbo(采用官方的starter)
 -[ ] jwt
@@ -404,6 +404,56 @@ pagehelper 官方文档：<https://github.com/pagehelper/Mybatis-PageHelper/blob
 ```
 
 详细见: `AccountMapper` 及相关测试用例。
+
+## 异步编程
+
+在 SpringBoot 实现异步编程的话，通过 Spring 提供的两个注解会让这件事情变的非常简单。
+
+* `@EnableAsync`: 通过在配置类或者Main类上加@EnableAsync开启对异步方法的支持。
+* `@Async`: 可以作用在类上或者方法上，作用在类上代表这个类的所有方法都是异步方法。
+
+自定义 TaskExecutor:
+
+```java
+/**
+ * 描述: 自定义Executor，没有自定义的话, Spring 将创建一个 SimpleAsyncTaskExecutor 并使用它
+ *
+ * @author Lin
+ * @since 2020-02-06 3:31 下午
+ */
+@Configuration
+@EnableAsync
+public class AsyncConfig {
+
+    private static final int CORE_POOL_SIZE = 6;
+    private static final int MAX_POOL_SIZE = 10;
+    private static final int QUEUE_CAPACITY = 100;
+
+    @Bean
+    public Executor taskExecutor() {
+        // Spring 默认配置是核心线程数大小为1，最大线程容量大小不受限制，队列容量也不受限制。
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        // 核心线程数
+        executor.setCorePoolSize(CORE_POOL_SIZE);
+        // 最大线程数
+        executor.setMaxPoolSize(MAX_POOL_SIZE);
+        // 队列大小
+        executor.setQueueCapacity(QUEUE_CAPACITY);
+        // 当最大池已满时，此策略保证不会丢失任务请求，但是可能会影响应用程序整体性能。
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setThreadNamePrefix("My-ThreadPoolTaskExecutor-");
+        executor.initialize();
+        return executor;
+    }
+}
+```
+
+模拟异步服务 及REST-API: `AsyncServiceImpl`, `AsyncController`
+
+参考:
+
+* Creating Asynchronous Methods: <https://spring.io/guides/gs/async-method/>
+* Spring Boot Async Executor Management with ThreadPoolTaskExecutor: <https://medium.com/trendyol-tech/spring-boot-async-executor-management-with-threadpooltaskexecutor-f493903617d>
 
 ## 缓存 redis
 
