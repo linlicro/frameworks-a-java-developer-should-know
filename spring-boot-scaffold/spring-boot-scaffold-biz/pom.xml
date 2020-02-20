@@ -166,7 +166,6 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
         </dependency>
 
         <!--lombok-->
@@ -187,7 +186,6 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>5.1.1</version>
         </dependency>
 
         <!-- 解析 UserAgent 信息 -->
