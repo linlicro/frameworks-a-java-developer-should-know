@@ -1,12 +1,26 @@
 package me.icro.java.springboot.scaffold.elasticsearch.repository;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import me.icro.java.springboot.scaffold.elasticsearch.SearchApplicationTest;
 import me.icro.java.springboot.scaffold.elasticsearch.model.Person;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
+import org.elasticsearch.search.aggregations.metrics.avg.InternalAvg;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
+import org.springframework.data.elasticsearch.core.query.FetchSourceFilter;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 
 import java.util.List;
 
@@ -24,7 +38,7 @@ public class PersonRepositoryTest extends SearchApplicationTest {
     private PersonRepository personRepository;
 
     /**
-     * 测试 save
+     * 测试 新增
      */
     @Test
     public void testSave() {
@@ -33,6 +47,9 @@ public class PersonRepositoryTest extends SearchApplicationTest {
         log.info("saved {}", saved);
     }
 
+    /**
+     * 测试 批量新增
+     */
     @Test
     public void testSaveBatch() {
         List<Person> personList = Lists.newArrayList();
@@ -43,6 +60,9 @@ public class PersonRepositoryTest extends SearchApplicationTest {
         log.info("saved: {}", people);
     }
 
+    /**
+     * 测试 更新
+     */
     @Test
     public void testUpdate() {
         personRepository.findById(1L)
@@ -53,6 +73,9 @@ public class PersonRepositoryTest extends SearchApplicationTest {
                 });
     }
 
+    /**
+     * 测试删除
+     */
     @Test
     public void testDelete() {
         personRepository.deleteById(1L);
@@ -62,5 +85,114 @@ public class PersonRepositoryTest extends SearchApplicationTest {
         });
 
         personRepository.deleteAll(personRepository.findAll());
+    }
+
+    /**
+     * 测试普通查询，按生日倒序排序
+     */
+    @Test
+    public void testSelect() {
+        personRepository.findAll(Sort.by(Sort.Direction.DESC, "birthday"))
+                .forEach(p -> {
+                    log.info("{} - birthday: {}", p.getName(), DateUtil.formatDate(p.getBirthday()));
+                });
+    }
+
+    /**
+     * 自定义查询，根据年龄范围查询
+     */
+    @Test
+    public void testCustomSelectRangeOfAge() {
+        personRepository.findByAgeBetween(18, 19)
+                .forEach(p -> {
+                    log.info("{} - age: {}", p.getName(), p.getAge());
+                });
+    }
+
+    /**
+     * 高级查询
+     */
+    @Test
+    public void advanceSelect() {
+        // QueryBuilders 提供了很多静态方法，可以实现大部分查询条件的封装
+        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("name", "孙权");
+        log.info("queryBuilder : {}", queryBuilder.toString());
+
+        personRepository.search(queryBuilder).forEach(person -> log.info("person : {}", person));
+    }
+
+    /**
+     * 自定义高级查询
+     */
+    @Test
+    public void customAdvanceSelect() {
+        // 构造查询条件
+        NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
+        // 添加基本的分词条件
+        queryBuilder.withQuery(QueryBuilders.matchQuery("remark", "东汉"));
+        // 排序条件
+        queryBuilder.withSort(SortBuilders.fieldSort("age").order(SortOrder.DESC));
+        // 分页条件
+        queryBuilder.withPageable(PageRequest.of(0, 2));
+
+        Page<Person> people = personRepository.search(queryBuilder.build());
+        log.info("people - total_elements : {}", people.getTotalElements());
+        log.info("people - total_pages : {}", people.getTotalPages());
+        people.forEach(p -> {
+            log.info("person - name: {}, age: {}", p.getName(), p.getAge());
+        });
+    }
+
+    /**
+     * 聚合，平均年龄
+     */
+    @Test
+    public void agg() {
+        // 构造查询条件
+        NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
+        // 不查询任何结果
+        queryBuilder.withSourceFilter(new FetchSourceFilter(new String[]{""}, null));
+        // 平均年龄
+        queryBuilder.addAggregation(AggregationBuilders.avg("avg").field("age"));
+
+        log.info("queryBuilder : {}", JSONUtil.toJsonStr(queryBuilder.build()));
+
+        AggregatedPage<Person> people = (AggregatedPage<Person>) personRepository.search(queryBuilder.build());
+        double avgAge = ((InternalAvg) people.getAggregation("avg")).getValue();
+        log.info("avgAge : {}", avgAge);
+    }
+
+    /**
+     * 高级聚合查询，每个国家的人有几个，每个国家的平均年龄是多少
+     */
+    @Test
+    public void advanceAgg() {
+        // 构造查询条件
+        NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
+        // 不查询任何结果
+        queryBuilder.withSourceFilter(new FetchSourceFilter(new String[]{""}, null));
+
+        // 1. 添加一个新的聚合，聚合类型为terms，聚合名称为country，聚合字段为age
+        queryBuilder.addAggregation(AggregationBuilders.terms("country").field("country")
+                // 2. 在国家聚合桶内进行嵌套聚合，求平均年龄
+                .subAggregation(AggregationBuilders.avg("avg").field("age")));
+
+        log.info("queryBuilder : {}", JSONUtil.toJsonStr(queryBuilder.build()));
+
+        // 3. 查询
+        AggregatedPage<Person> people = (AggregatedPage<Person>) personRepository.search(queryBuilder.build());
+
+        // 4. 解析
+        // 4.1. 从结果中取出名为 country 的那个聚合，因为是利用String类型字段来进行的term聚合，所以结果要强转为StringTerm类型
+        StringTerms country = (StringTerms) people.getAggregation("country");
+        // 4.2. 获取桶
+        List<StringTerms.Bucket> buckets = country.getBuckets();
+        for (StringTerms.Bucket bucket : buckets) {
+            // 4.3. 获取桶中的key，即国家名称  4.4. 获取桶中的文档数量
+            log.info("{} 总共有 {} 人", bucket.getKeyAsString(), bucket.getDocCount());
+            // 4.5. 获取子聚合结果：
+            InternalAvg avg = (InternalAvg) bucket.getAggregations().asMap().get("avg");
+            log.info("平均年龄：{}", avg);
+        }
     }
 }
