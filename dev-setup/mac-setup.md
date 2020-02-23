@@ -880,25 +880,33 @@ Package Control 可方便管理Sublime text的插件，最方便的安装方式�
 
 Docker的命令参考[docker-cheat-sheet](https://github.com/wsargent/docker-cheat-sheet)。
 
-#### 一些小技巧
+### Docker 安装2
+
+安装yum-utils：
 
 ```sh
-# remove ALL your containers
-docker container prune
-
-# Delete all untagged containers
-docker image prune
-
-# See all space Docker take up
-docker system df
-
-# Get IP address of running container
-docker inspect [CONTAINER ID] | grep -wm1 IPAddress | cut -d '"' -f 4
-
-# Kill all running containers
-docker kill $(docker ps -q)
-
+yum install -y yum-utils device-mapper-persistent-data lvm2
 ```
+
+为yum源添加docker仓库位置：
+
+```sh
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+```
+
+安装docker:
+
+```sh
+yum install docker-ce
+```
+
+启动docker:
+
+```sh
+systemctl start docker
+```
+
+Docker cheat-sheet: [](./docker-cheatsheet.md)
 
 ## Elasticsearch
 
@@ -918,6 +926,8 @@ curl -XGET 'http://localhost:9200/'
 文档: <https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html> [Elasticsearch: The Definitive Guide](https://www.elastic.co/guide/en/elasticsearch/guide/master/index.html)
 
 GUI: [dejavu](https://github.com/appbaseio/dejavu)
+
+cheatsheet: [elasticsearch-cheatsheet](./elasticsearch-cheatsheet.md)
 
 ## 其他 - 软件
 
