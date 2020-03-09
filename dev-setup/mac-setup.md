@@ -204,29 +204,15 @@ brew cask 安装常用工具:
 * qlImageSize - Display image size and resolution
 * ...
 
-APP类
+APP类:
 
-```sh
-brew cask install \
-    alfred \
-    android-file-transfer \
-    appcleaner \
-    caffeine \
-    cheatsheet \
-    docker \
-    doubletwist \
-    dropbox \
-    google-chrome \
-    google-hangouts \
-    flux \
-    1password \
-    spectacle \
-    sublime-text \
-    superduper \
-    transmission \
-    valentina-studio \
-    vlc
-```
+* switchhosts - Switch hosts quickly<https://github.com/oldj/SwitchHosts>
+* hiddenbar - A ultra-light MacOS utility that helps hide menu bar icons <https://formulae.brew.sh/cask/hiddenbar>
+* Caffeine - Don't let your Mac fall asleep <https://formulae.brew.sh/cask/caffeine>
+* spectacle - Move and resize windows with ease <https://formulae.brew.sh/cask/spectacle>
+* Transmission - a cross-platform BitTorrent client. <https://formulae.brew.sh/cask/transmission>
+* iina - The modern media player for macOS. <https://formulae.brew.sh/cask/iina>
+* flux - makes the color of your computer's display adapt to the time of day, warm at night and like sunlight during the day. <https://formulae.brew.sh/cask/flux>
 
 ### 扩展2 - Homebrew Services
 
@@ -457,7 +443,9 @@ git config --global core.excludesfile ~/.gitignore
 
 ### GitHub配置
 
-... 待补充
+```sh
+brew cask install github
+```
 
 ## Python
 
@@ -488,6 +476,8 @@ brew install pyenv
 
 ```sh
 echo 'eval "$(pyenv init -)"' >> ~/.zshrc
+# commands.md <https://github.com/pyenv/pyenv/blob/master/COMMANDS.md>
+
 eval "$(pyenv virtualenv-init -)" >> ~/.zshrc
 # 如果使用默认的shell，添加配置至 ~/.bash_profile
 ```
@@ -572,9 +562,22 @@ pip uninstall <package> # to uninstall a package
 
 ### virtualenv
 
-[virtualenv](https://virtualenv.pypa.io/) is a tool that creates an isolated Python environment for each of your projects.
+[virtualenv](https://virtualenv.pypa.io/) is a tool that creates an isolated Python environment for each of your projects. virtualenv 就是一个能够创建隔离的 python 环境的工具。
 
-pyenv 插件：pyenv-virtualenv
+这里使用一个基于 pyenv 的插件：pyenv-virtualenv。
+
+```sh
+brew install pyenv-virtualenv
+
+# 创建工作环境
+pyenv virtualenv (python-version) (workspace-name)
+# 激活环境
+pyenv activate (workspace-name)
+# 退出环境
+pyenv deactivate
+## 在这个隔离的虚拟环境中，可以使用 pip 安装需要的包，而不会影响到其他的 python 版本。但是可能会在 home directory 下创建一些隐藏目录（如 keras、matplotlib、jupyter 等）
+
+```
 
 ## Java 环境
 
@@ -670,6 +673,14 @@ mysqladmin -u root password 'new-password'
 ```sh
 brew cask install sequel-pro
 ```
+
+使用Sequel Pro 导出表结构图:
+
+1. 安装graphviz： `brew install graphviz`
+2. 用Sequel Pro导出Dot文件
+3. 用dot命令: `dot -Tjpg test.dot > test.jpg`
+
+DataGrip ：jetbrains 旗下跨平台的数据库管理工具。
 
 ## Visual Studio Code
 
@@ -931,17 +942,22 @@ cheatsheet: [elasticsearch-cheatsheet](./elasticsearch-cheatsheet.md)
 
 ## 其他 - 软件
 
-### 下载工具 Motrix
+### API测试
 
-[motrix](https://motrix.app/)是一款全能的下载工具，支持下载 HTTP、FTP、BT、磁力链、百度网盘等资源。
-
-```sh
-brew update && brew cask install motrix
-```
+* Insomnia: API接口测试。美观小巧大方，非常适合个人使用。
+* PostMan
 
 ### Charles
 
 抓包神器 / Mock工具
+
+### PicGo
+
+图床管理工具。
+
+```sh
+brew cask install picgo
+```
 
 ### Dash
 
@@ -950,6 +966,10 @@ Mac专属的文档管理工具
 ### Rescue Time
 
 日常行为管理。可以分析出日常使用电脑时间分配，细化到软件/网站层面，对于提升工作效率还是很有意义的。
+
+```sh
+brew cask install rescuetime
+```
 
 ### sizeup
 
@@ -966,6 +986,22 @@ Mac专属的文档管理工具
 ### HandShaker
 
 情怀工匠精神锤出品，mac上管理安卓手机文件一把好手
+
+### 下载工具 Motrix
+
+[motrix](https://motrix.app/)是一款全能的下载工具，支持下载 HTTP、FTP、BT、磁力链、百度网盘等资源。
+
+```sh
+brew update && brew cask install motrix
+```
+
+### 更多
+
+* shuttle ：让我们更加方便地远程登录某台机器。
+* XMind :思维导图
+* Axure ：最强大的原型图制作工作，可以共享协作
+* gif截图工具：Gifox。截图工具 ：Xnip（command+shift+4是mac自带的截图也很好用）
+* Mac APP 卸载： AppCleaner
 
 ## 参考
 
