@@ -166,3 +166,8 @@ graph TD;
 * 广度优先搜索用于非加权图中查找最短路径
 * 狄克斯特拉算法用于加权图中查找最短路径
 * 当存在权重为负数的边时狄克斯特拉算法不适用，请使用贝尔曼-福德算法
+
+## leetcode
+
+* leetCode 505 - 迷宫 II
+[network-delay-time](https://leetcode-cn.com/problems/network-delay-time/)
