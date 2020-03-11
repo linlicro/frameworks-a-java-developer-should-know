@@ -662,6 +662,10 @@ brew install mysql
 # 启动(开机自启动)
 brew services start mysql
 
+# mysql path
+echo 'export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
 # 修改密码(默认无密码，不影响本地的开发)
 mysqladmin -u root password 'new-password'
 ```
@@ -681,6 +685,22 @@ brew cask install sequel-pro
 3. 用dot命令: `dot -Tjpg test.dot > test.jpg`
 
 DataGrip ：jetbrains 旗下跨平台的数据库管理工具。
+
+## Redis
+
+安装:
+
+```sh
+brew install redis
+```
+
+启动:
+
+```sh
+brew services start redis
+```
+
+more information refer to Redis' [documentation](http://redis.io/documentation).
 
 ## Visual Studio Code
 
@@ -942,6 +962,11 @@ cheatsheet: [elasticsearch-cheatsheet](./elasticsearch-cheatsheet.md)
 
 ## 其他 - 软件
 
+### 邮箱客户端
+
+* [Foxmail](http://www.foxmail.com/mac/en) - Fast email client.
+* [Airmail](http://airmailapp.com/) - Fast email client. For both Mac OS and iOS.
+
 ### API测试
 
 * Insomnia: API接口测试。美观小巧大方，非常适合个人使用。
@@ -993,6 +1018,12 @@ brew cask install rescuetime
 
 ```sh
 brew update && brew cask install motrix
+```
+
+### 壁纸应用 pap.er
+
+```sh
+brew cask install paper
 ```
 
 ### 更多
