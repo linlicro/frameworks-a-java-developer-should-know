@@ -651,6 +651,49 @@ Java开发IDE推荐[IntelliJ](https://www.jetbrains.com/idea/download/)，另附
 
 jetbrains-agent 参考: <https://zhile.io/2018/08/25/jetbrains-license-server-crack.html>
 
+### 小工具
+
+* jd-gui: a standalone graphical utility that displays Java sources from CLASS files. `brew cask install JD-GUI`
+
+## Node.js
+
+The recommended way to install [Node.js](http://nodejs.org/) is to use [nvm](https://github.com/creationix/nvm) (Node Version Manager) which allows you to manage multiple versions of Node.js on the same machine.
+
+### Installing and Updating nvm
+
+script command: <https://github.com/nvm-sh/nvm#install--update-script>
+
+常用命令:
+
+```sh
+# verify that it was installed correctly
+command -v nvm
+
+# View the all available stable versions of Node
+nvm ls-remote --lts
+
+# Install the latest stable version, also set the first version installed as your default version.
+nvm install node
+
+# install another specific version
+nvm install 10
+
+# switch between versions
+nvm use 10
+nvm use default
+
+# See which versions you have install
+nvm ls
+
+# Change the default version
+nvm alias default 10
+
+# create a .nvmrc file containing the Node.js version the project uses
+echo "10" > .nvmrc
+# load the correct version of Node.js
+nvm use
+```
+
 ## MySQL
 
 一般通过`Homebrew`来安装[MySQL](http://www.mysql.com/)。*注: 我们常用5.7版本，可以通过命令`brew install mysql@5.7`来安装*
@@ -701,6 +744,8 @@ brew services start redis
 ```
 
 more information refer to Redis' [documentation](http://redis.io/documentation).
+
+redis GUI tool: [medis]<https://github.com/luin/medis>
 
 ## Visual Studio Code
 
@@ -966,6 +1011,12 @@ cheatsheet: [elasticsearch-cheatsheet](./elasticsearch-cheatsheet.md)
 
 * [Foxmail](http://www.foxmail.com/mac/en) - Fast email client.
 * [Airmail](http://airmailapp.com/) - Fast email client. For both Mac OS and iOS.
+
+### 画流程图
+
+* **StarUML** `brew cask install StarUML`
+* [ProcessOn](https://www.processon.com/)
+* **draw.io** <https://app.diagrams.net/>
 
 ### API测试
 
