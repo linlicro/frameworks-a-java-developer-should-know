@@ -1045,12 +1045,18 @@ brew cask install picgo
 
 Mac专属的文档管理工具
 
-### Rescue Time
+### 时间管理
 
-日常行为管理。可以分析出日常使用电脑时间分配，细化到软件/网站层面，对于提升工作效率还是很有意义的。
+`Rescue Time` 日常行为管理。可以分析出日常使用电脑时间分配，细化到软件/网站层面，对于提升工作效率还是很有意义的。
 
 ```sh
 brew cask install rescuetime
+```
+
+Focus is a distraction blocker that helps you improve your productivity(一个漂亮的番茄工作法为基础的时间管理工具。)
+
+```sh
+brew cask info focus
 ```
 
 ### sizeup
