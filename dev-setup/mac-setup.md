@@ -1018,6 +1018,12 @@ cheatsheet: [elasticsearch-cheatsheet](./elasticsearch-cheatsheet.md)
 * [ProcessOn](https://www.processon.com/)
 * **draw.io** <https://app.diagrams.net/>
 
+#### 附1.StarUML破解
+
+参考: <https://gist.github.com/trandaison/40b1d83618ae8e3d2da59df8c395093a>
+
+上面提到了2.0版本 和 3.0版本的破解方案，本人使用的版本是3.2.2，使用修改源码方式 亲测可用。
+
 ### API测试
 
 * Insomnia: API接口测试。美观小巧大方，非常适合个人使用。
