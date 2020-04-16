@@ -357,7 +357,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/mas
 # 设置主题
 ZSH_THEME=pygmalion
 # 设置插件
-plugins=(git colored-man colorize github jira vagrant virtualenv pip python brew osx zsh-syntax-highlighting)
+plugins=(git colorize github jira vagrant virtualenv pip python brew osx docker)
 
 # ls 配色生效
 unset LSCOLORS
@@ -694,6 +694,23 @@ echo "10" > .nvmrc
 nvm use
 ```
 
+### yarn
+
+[yarn](https://classic.yarnpkg.com/en/) 是由Facebook、Google、Exponent 和 Tilde 联合推出了一个新的 JS 包管理工具， 是为了弥补 npm 的一些缺陷而出现的。
+
+Intall command: `brew install yarn`.
+
+配置:
+
+```sh
+yarn config set registry http://registry.npm.taobao.org
+```
+
+Yarn 和 npm 的区别：
+
+* [npm和yarn的区别，我们该如何选择？](https://zhuanlan.zhihu.com/p/27449990)
+* [Npm vs Yarn 之备忘详单](https://www.jeffjade.com/2017/12/30/135-npm-vs-yarn-detial-memo/)
+
 ## MySQL
 
 一般通过`Homebrew`来安装[MySQL](http://www.mysql.com/)。*注: 我们常用5.7版本，可以通过命令`brew install mysql@5.7`来安装*
@@ -727,7 +744,9 @@ brew cask install sequel-pro
 2. 用Sequel Pro导出Dot文件
 3. 用dot命令: `dot -Tjpg test.dot > test.jpg`
 
-DataGrip ：jetbrains 旗下跨平台的数据库管理工具。
+DataGrip：jetbrains 旗下跨平台的数据库管理工具。
+
+Navicat：<https://www.navicat.com/en/>，及科学安装教程 <https://zhuanlan.zhihu.com/p/108692959>
 
 ## Redis
 
@@ -956,6 +975,10 @@ Package Control 可方便管理Sublime text的插件，最方便的安装方式�
 
 Docker的命令参考[docker-cheat-sheet](https://github.com/wsargent/docker-cheat-sheet)。
 
+#### 镜像加速器
+
+参考阿里云的: <https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors>
+
 ### Docker 安装2
 
 安装yum-utils：
@@ -1024,10 +1047,23 @@ cheatsheet: [elasticsearch-cheatsheet](./elasticsearch-cheatsheet.md)
 
 上面提到了2.0版本 和 3.0版本的破解方案，本人使用的版本是3.2.2，使用修改源码方式 亲测可用。
 
+### PDF阅读
+
+* [PDF Expert](https://pdfexpert.com/) - PDF reader/editor
+* Skim<https://skim-app.sourceforge.io/> - PDF reader and note-taker for OS X.
+
 ### API测试
 
 * Insomnia: API接口测试。美观小巧大方，非常适合个人使用。
 * PostMan
+
+### Alfred
+
+```sh
+brew cask install alfred
+```
+
+Guides and Tutorials: <https://www.alfredapp.com/help/guides-and-tutorials/>
 
 ### Charles
 
