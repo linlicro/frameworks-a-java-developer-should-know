@@ -19,8 +19,38 @@
 * 一本关于排序算法的 GitBook 在线书籍 《十大经典排序算法》，使用 JavaScript & Python & Go & Java 实现。<https://github.com/hustcc/JS-Sorting-Algorithm>
 * 英文免费电子书，伊利诺伊大学计算机科学课程的讲义。<http://jeffe.cs.illinois.edu/teaching/algorithms/>
 * [LeetCode Animation](https://github.com/MisterBooo/LeetCodeAnimationvv)
+* 数据结构和算法动态可视化 (Chinese)<https://visualgo.net/zh>
 * [图数据结构入门](https://adrianmejia.com/blog/2018/05/14/data-structures-for-beginners-graphs-time-complexity-tutorial/)
 * 极客-算法训练营
+
+### 算法相关视频
+
+* 九章算法 <https://www.youtube.com/channel/UCdBXs_F9YlBodIH7eK0BYfQ>
+* 花花酱 <https://www.youtube.com/channel/UC5xDNEcvb1vgw3lE21Ack2Q>
+
+### 算法 Algorithm Books
+
+* `入门级` - 《算法图解》
+* `入门级` - 《我的第一本算法书》
+* `入门级` - 《啊哈!算法》
+* `经典` - 《算法 第四版》
+* `经典` - 《编程珠玑》
+* `经典` - 《算法设计手册》
+* `经典` - 《算法导论》
+* `经典` - 《计算机程序设计艺术（第 1 卷）》
+* `面试突击` - 《剑指 Offer》
+* `面试突击` - 程序员代码面试指南：IT 名企算法与数据结构题目最优解（第 2 版）
+* `面试突击` - 《编程之美》
+* `面试突击` - Java 面试的算法问题 <http://www.codespaghetti.com/java-algorithms-questions/>
+
+**请支持正版**, 通过正规渠道购买: ) <https://book.jd.com/>；另外，微信读书上有不少可以白嫖: )
+
+电子版本[百度盘](不完全收录，仅供学习参阅)，链接: <https://pan.baidu.com/s/1RkpFMq0mjdPIL-e7TAhPPw> 提取码: `vxey`
+
+## Java
+
+* **concurrent** 这是RedSpider社区成员原创与维护的Java多线程系列文章。<https://github.com/RedSpider1/concurrent>
+* To Be Top Javaer - Java工程师成神之路 <https://github.com/hollischuang/toBeTopJavaer>
 
 ## Spring 全家桶
 
@@ -55,26 +85,7 @@ Spring Security 是 Spring 全家桶中非常强大的一个用来做身份验�
 
 * 《Spring Cloud与Docker微服务架构实战》
 
-### 算法 Algorithm
-
-* `入门级` - 《算法图解》
-* `入门级` - 《我的第一本算法书》
-* `入门级` - 《啊哈!算法》
-* `经典` - 《算法 第四版》
-* `经典` - 《编程珠玑》
-* `经典` - 《算法设计手册》
-* `经典` - 《算法导论》
-* `经典` - 《计算机程序设计艺术（第 1 卷）》
-* `面试突击` - 《剑指 Offer》
-* `面试突击` - 程序员代码面试指南：IT 名企算法与数据结构题目最优解（第 2 版）
-* `面试突击` - 《编程之美》
-* `面试突击` - Java 面试的算法问题 <http://www.codespaghetti.com/java-algorithms-questions/>
-
-**请支持正版**, 通过正规渠道购买: ) <https://book.jd.com/>；另外，微信读书上有不少可以白嫖: )
-
-电子版本[百度盘](不完全收录，仅供学习参阅)，链接: <https://pan.baidu.com/s/1RkpFMq0mjdPIL-e7TAhPPw> 提取码: `vxey`
-
-### Java
+### Java Books
 
 精不在多，夯实Java基础:
 
