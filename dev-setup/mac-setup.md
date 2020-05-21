@@ -748,6 +748,8 @@ DataGrip：jetbrains 旗下跨平台的数据库管理工具。
 
 Navicat：<https://www.navicat.com/en/>，及科学安装教程 <https://zhuanlan.zhihu.com/p/108692959>
 
+Falcon<https://github.com/plotly/falcon>: 一个免费的、开源的SQL编辑器，具有内联数据可视化功能。它目前支持连接RedShift、MySQL、PostgreSQL、IBM DB2、Impala、MS SQL、Oracle、SQLite 等。
+
 ## Redis
 
 安装:
@@ -1095,9 +1097,11 @@ Focus is a distraction blocker that helps you improve your productivity(一个�
 brew cask info focus
 ```
 
-### sizeup
+### 窗口管理
 
-窗口管理, 多/大显示器尤其实用
+[Rectangle](https://github.com/rxhanson/Rectangle) is a window management app based on Spectacle, written in Swift.
+
+`sizeup`: 窗口管理, 多/大显示器尤其实用
 
 ### IINA
 
@@ -1127,11 +1131,14 @@ brew cask install paper
 
 ### 更多
 
+* Manico 是一个为 macOS 设计的快速启动和切换 App 的工具，使用简单没有学习成本。
 * shuttle ：让我们更加方便地远程登录某台机器。
 * XMind :思维导图
 * Axure ：最强大的原型图制作工作，可以共享协作
 * gif截图工具：Gifox。截图工具 ：Xnip（command+shift+4是mac自带的截图也很好用）
+* 录屏工具: kap <https://getkap.co/>
 * Mac APP 卸载： AppCleaner
+* [NetNewsWire](https://ranchero.com/netnewswire/) 是一个可以在 Mac 及 iPhone 上使用的免费开源的 RSS 阅读器
 
 ## 参考
 
