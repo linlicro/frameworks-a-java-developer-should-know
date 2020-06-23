@@ -1091,6 +1091,12 @@ Mac专属的文档管理工具
 brew cask install rescuetime
 ```
 
+stretchly<https://github.com/hovancik/stretchly> - break time reminder app.
+
+```sh
+brew update && brew cask install stretchly
+```
+
 Focus is a distraction blocker that helps you improve your productivity(一个漂亮的番茄工作法为基础的时间管理工具。)
 
 ```sh
