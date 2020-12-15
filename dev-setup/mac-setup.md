@@ -236,6 +236,17 @@ brew services start <formula>
 brew services list
 ```
 
+### brew 的备份和恢复
+
+如果要在两台 Mac 间备份和恢复 brew 安装的包，可以使用：
+
+```sh
+brew bundle dump    # dump
+brew bundle         # 恢复
+```
+
+brew bundle dump 会生成一个 Brewfile 文件，这是一个纯文本的文件，里面列举了系统上的 brew 配置和安装的列表，那么我只需要维护一个 Brewfile 文件就可以一键安装必备的命令和桌面软件了。
+
 ### 使用Homebrew中遇到的问题记录
 
 Q1: cannot load such file -- active_support/core_ext/object/blank (LoadError):
@@ -277,6 +288,18 @@ Q3: Error: Another active Homebrew update process is already in progress.
 
 ```sh
 rm -rf /usr/local/var/homebrew/locks # 删除临时文件
+```
+
+Q4: 卡在 Updating Homebrew 好久
+
+关闭自动更新，在. zshrc 文件中加入下方命令，如果是 bash 请加在. bash_profile 文件中，全局变量可以 sudo vi /etc/profile
+
+```sh
+vim ~/.zshrc
+export HOMEBREW_NO_AUTO_UPDATE=true
+
+# 刷新环境变量
+source ~/.zshrc
 ```
 
 ## iTerm2
@@ -1032,6 +1055,10 @@ cheatsheet: [elasticsearch-cheatsheet](./elasticsearch-cheatsheet.md)
 
 ## 其他 - 软件
 
+### 替代APP Store
+
+通过 App Store 安装的应用可以通过 mas 来管理。
+
 ### 邮箱客户端
 
 * [Foxmail](http://www.foxmail.com/mac/en) - Fast email client.
@@ -1145,6 +1172,10 @@ brew cask install paper
 * 录屏工具: kap <https://getkap.co/>
 * Mac APP 卸载： AppCleaner
 * [NetNewsWire](https://ranchero.com/netnewswire/) 是一个可以在 Mac 及 iPhone 上使用的免费开源的 RSS 阅读器
+* 压缩图片 用 Google 的 Squoosh<https://squoosh.app/>
+* 剪切板增强管理工具 CopyQ `brew cask install copyq`
+* OpenInTerminal<https://github.com/Ji4n1ng/OpenInTerminal> 可以实现在 Finder 目录中，立即打开终端
+* [Mac keyboard shortcuts](https://support.apple.com/en-us/HT201236)
 
 ## 参考
 
@@ -1153,3 +1184,6 @@ brew cask install paper
 * [mac-dev-setup](https://github.com/nicolashery/mac-dev-setup)
 * [使用 pyenv 管理 Python 版本](http://einverne.github.io/post/2017/04/pyenv.html)
 * [还在用 Win？教你从零把 Mac 打造成开发利器](https://mp.weixin.qq.com/s/qRzpNHZSL6hnZNwUnoaO1g)
+* [MacBook Pro 初始设置记录](https://einverne.github.io/post/2020/07/macbook-pro-initial-setup.html)
+* [强迫症的 Mac 设置指南](https://github.com/macdao/ocds-guide-to-setting-up-mac)
+* [My wonderful world of macOS](https://github.com/nikitavoloboev/my-mac-os)
