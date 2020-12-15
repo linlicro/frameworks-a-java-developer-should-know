@@ -27,7 +27,8 @@
 
 ## 架构篇
 
-...
+* [可参考的技术架构(微服务)](system-design/技术架构.md)
+* 用户中心的架构: [设计doc](system-design/用户中心设计.md)
 
 我的学习资料汇总: [收录的参考资料](tutorials_%20and_useful%20resources.md)
 
